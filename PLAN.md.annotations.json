@@ -194,6 +194,22 @@
       "content": "hjbvjhbhjbubgubghbuyhbhgbubghb",
       "status": "open",
       "replies": []
+    },
+    {
+      "id": "e7a9e89b-e43c-4f21-8146-5cd1d2584daa",
+      "anchor": {
+        "line": 42,
+        "endLine": 47,
+        "contextBefore": "### 7. Version Diff\n- Track annotation changes across plan versions",
+        "contextAfter": "- Real-time annotation sidebar showing all comments\n- Visual approval workflow (approve/reject buttons)",
+        "contentHash": "fbd1d677e86b"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:51:23.087Z",
+      "content": "kjnjkbhjb",
+      "status": "open",
+      "replies": []
     }
   ],
   "approvals": [

@@ -1,4 +1,4 @@
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 // Typing animation hook
@@ -31,13 +31,11 @@ function useTypingEffect(text: string, speed: number = 50) {
 function TerminalLine({
   command,
   output,
-  delay = 0,
-  isActive = false
+  delay = 0
 }: {
   command: string;
   output?: string;
   delay?: number;
-  isActive?: boolean;
 }) {
   const [showOutput, setShowOutput] = useState(false);
   const { displayText, isComplete } = useTypingEffect(command, 40);

@@ -1,11 +1,25 @@
-import { Hero, Features, HowItWorks, QuickStart, Footer } from './components';
+import {
+  Navbar,
+  Hero,
+  Problem,
+  Features,
+  Demo,
+  HowItWorks,
+  Testimonials,
+  QuickStart,
+  Footer
+} from './components';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800">
+    <div className="min-h-screen bg-slate-900 text-slate-100">
+      <Navbar />
       <Hero />
+      <Problem />
       <Features />
+      <Demo />
       <HowItWorks />
+      <Testimonials />
       <QuickStart />
       <Footer />
     </div>
