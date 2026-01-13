@@ -178,6 +178,22 @@
       "content": "asdfvadfvc",
       "status": "resolved",
       "replies": []
+    },
+    {
+      "id": "d38e29c6-7498-49b4-8c4c-9c243fe3bcc2",
+      "anchor": {
+        "line": 9,
+        "endLine": 15,
+        "contextBefore": "\n### 1. Inline Annotations",
+        "contextAfter": "- `question` - Clarification needed\n- `suggestion` - Improvement idea",
+        "contentHash": "ac52eff60c8c"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:47:31.228Z",
+      "content": "hjbvjhbhjbubgubghbuyhbhgbubghb",
+      "status": "open",
+      "replies": []
     }
   ],
   "approvals": [

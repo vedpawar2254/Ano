@@ -75,9 +75,13 @@
   // Split content into lines
   let lines = $derived(content.split('\n'));
 
-  // Get annotations for a specific line
+  // Get annotations for a specific line (including multi-line ranges)
   function getLineAnnotations(lineNum: number): Annotation[] {
-    return annotations.filter(a => a.anchor.line === lineNum);
+    return annotations.filter(a => {
+      const startLine = a.anchor.line;
+      const endLine = a.anchor.endLine || a.anchor.line;
+      return lineNum >= startLine && lineNum <= endLine;
+    });
   }
 
   // Get the most severe annotation type for a line (for marker color)

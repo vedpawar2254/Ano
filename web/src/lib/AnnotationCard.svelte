@@ -68,7 +68,7 @@
       </span>
       <!-- Line number -->
       <span class="text-xs text-slate-500">
-        L{annotation.anchor.line}
+        L{annotation.anchor.line}{annotation.anchor.endLine && annotation.anchor.endLine !== annotation.anchor.line ? `-${annotation.anchor.endLine}` : ''}
       </span>
     </div>
     <!-- Status -->
