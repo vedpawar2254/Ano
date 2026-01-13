@@ -41,6 +41,14 @@ Structured comment types for clarity:
 - Track annotation changes across plan versions
 - See what feedback was addressed between versions
 
+### 8. Web View & Annotator
+- Local web server for visual annotation interface
+- Render markdown/plans with inline annotation markers
+- Click-to-annotate: select text and add comments
+- Real-time annotation sidebar showing all comments
+- Visual approval workflow (approve/reject buttons)
+- Share-able URLs for team review sessions
+
 ## Technical Approach
 
 ### Storage Format (annotations.json)
@@ -65,6 +73,7 @@ Structured comment types for clarity:
   "approvals": [
     {
       "author": "bob",
+      "title":"Tech Lead",
       "status": "approved",
       "timestamp": "2024-01-14T11:00:00Z"
     }
@@ -77,6 +86,8 @@ Structured comment types for clarity:
 2. **MCP server**: For Claude to read/write annotations
 3. **Hook**: Pre-execution approval check
 4. **CLI tool**: Standalone for viewing/managing annotations
+5. **Web server**: Local Express server for annotation UI
+6. **Web client**: Svelte app for annotation interface
 
 ## Use Cases
 - **Code review workflows** - Review Claude-generated plans before execution
@@ -86,6 +97,8 @@ Structured comment types for clarity:
 ## Design Decisions
 - **Line drift handling**: Content anchoring - store surrounding text context to relocate annotations when files change
 - **MVP scope**: Full team workflow - include approvals, templates, and sharing from start
+- **Web deployment**: Local only - runs on localhost, team syncs via git
+- **Frontend**: Svelte + Tailwind for lightweight, fast UI
 
 ## Annotation Anchoring Strategy
 ```json
@@ -124,7 +137,17 @@ When file changes, use context matching to relocate annotations to their new pos
 2. Author tracking in annotations
 3. Export/import functionality for sharing
 
-### Phase 5: Polish
+### Phase 5: Web View & Annotator
+1. Build local web server (Express/Fastify)
+2. Create web client (Svelte + Tailwind)
+   - Markdown renderer with annotation highlights
+   - Click-to-annotate text selection
+   - Annotation sidebar with threads
+   - Approval buttons and status display
+3. `ano serve` command to launch web UI on localhost
+4. File watcher for real-time updates when annotation files change
+
+### Phase 6: Polish
 1. Annotation templates (concern, question, suggestion, blocker)
 2. Version diff tracking
 3. Summary views and statistics
@@ -133,3 +156,4 @@ When file changes, use context matching to relocate annotations to their new pos
 - Markdown formatting support in annotation content?
 - Notification system for new annotations?
 - Integration with GitHub PR reviews?
+- How can we rethink and then reimplement the ways tech teams function?
