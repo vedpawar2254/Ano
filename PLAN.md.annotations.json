@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "file": "/Users/vedpawar2254/Desktop/personalP/ano/PLAN.md",
+  "fileHash": "58c156e05536",
+  "annotations": [
+    {
+      "id": "2cea2d21-8fd2-4952-b7dd-36ba40b6f780",
+      "anchor": {
+        "line": 10,
+        "contextBefore": "### 1. Inline Annotations\n- Add comments to specific lines/sections in plans and markdown",
+        "contextAfter": "- Mark comments as resolved/unresolved\n",
+        "contentHash": "bbe6d266ad20"
+      },
+      "type": "question",
+      "author": "ved",
+      "timestamp": "2026-01-13T19:34:43.619Z",
+      "content": "Should we add more annotation types?",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "1d9cb93b-da42-4131-a621-8114ae2e48c2",
+      "anchor": {
+        "line": 44,
+        "contextBefore": "- See what feedback was addressed between versions\n",
+        "contextAfter": "- Local web server for visual annotation interface\n- Render markdown/plans with inline annotation markers",
+        "contentHash": "83c4e8827677"
+      },
+      "type": "suggestion",
+      "author": "ved",
+      "timestamp": "2026-01-13T19:34:49.745Z",
+      "content": "Web view is the exciting part!",
+      "status": "open",
+      "replies": []
+    }
+  ],
+  "approvals": [
+    {
+      "author": "ved",
+      "title": "Developer",
+      "status": "approved",
+      "timestamp": "2026-01-13T19:35:05.210Z"
+    }
+  ]
+}

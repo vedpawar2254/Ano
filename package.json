@@ -13,12 +13,25 @@
     "build": "tsc",
     "start": "node dist/index.js"
   },
-  "keywords": ["claude-code", "annotation", "review", "collaboration","ano","claude-code-plugin","mcp","claude-code-extension"],
+  "keywords": [
+    "claude-code",
+    "annotation",
+    "review",
+    "collaboration",
+    "ano",
+    "claude-code-plugin",
+    "mcp",
+    "claude-code-extension"
+  ],
   "author": "Ved Pawar <ved.pawar2024@rishihood.edu.in>",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.0.8",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2"
   }
 }
