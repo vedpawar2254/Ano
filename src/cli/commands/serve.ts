@@ -12,9 +12,11 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve, dirname, basename } from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { createServer } from 'node:http';
+import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { existsSync } from 'node:fs';
-import { readAnnotationFile } from '../../core/annotations.js';
+import { readAnnotationFile, addAnnotation, resolveAnnotation, setApproval } from '../../core/annotations.js';
+import { getAuthorString } from '../../core/config.js';
+import type { AnnotationType, ApprovalStatus } from '../../core/types.js';
 
 // Simple static file server
 const MIME_TYPES: Record<string, string> = {
@@ -25,6 +27,22 @@ const MIME_TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
 };
+
+// Helper to parse JSON body from request
+async function parseJsonBody(req: IncomingMessage): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => body += chunk.toString());
+    req.on('end', () => {
+      try {
+        resolve(JSON.parse(body));
+      } catch (e) {
+        reject(new Error('Invalid JSON'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
 
 export const serveCommand = new Command('serve')
   .description('Start web viewer for annotations')
@@ -56,7 +74,7 @@ export const serveCommand = new Command('serve')
       const url = req.url || '/';
 
       // API endpoint for current file data
-      if (url === '/api/current') {
+      if (url === '/api/current' && req.method === 'GET') {
         try {
           const content = await readFile(filePath, 'utf-8');
           const annotations = await readAnnotationFile(filePath);
@@ -74,6 +92,89 @@ export const serveCommand = new Command('serve')
               approvals: [],
             },
           }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to add an annotation
+      if (url === '/api/annotate' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { line, content, type, endLine } = body as { line: number; content: string; type: AnnotationType; endLine?: number };
+
+          if (!line || !content || !type) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required fields: line, content, type' }));
+            return;
+          }
+
+          const author = await getAuthorString();
+          await addAnnotation({
+            file: filePath,
+            line,
+            endLine,
+            type,
+            author,
+            content,
+          });
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to resolve an annotation
+      if (url === '/api/resolve' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { annotationId } = body as { annotationId: string };
+
+          if (!annotationId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required field: annotationId' }));
+            return;
+          }
+
+          const resolved = await resolveAnnotation(filePath, annotationId);
+          if (!resolved) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Annotation not found' }));
+            return;
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to approve/request changes
+      if (url === '/api/approve' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { status, comment } = body as { status: ApprovalStatus; comment?: string };
+
+          if (!status || !['approved', 'changes_requested'].includes(status)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid status. Must be "approved" or "changes_requested"' }));
+            return;
+          }
+
+          const author = await getAuthorString();
+          await setApproval(filePath, author, status, undefined, comment);
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
         } catch (error) {
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: (error as Error).message }));

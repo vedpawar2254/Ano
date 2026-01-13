@@ -6,10 +6,71 @@
     annotations: Annotation[];
     selectedLine: number | null;
     onLineClick: (line: number) => void;
+    onLineDoubleClick: (line: number) => void;
     onAnnotationClick: (annotation: Annotation) => void;
+    onSelection?: (line: number, endLine: number | undefined, x: number, y: number) => void;
+    onSelectionClear?: () => void;
   }
 
-  let { content, annotations, selectedLine, onLineClick, onAnnotationClick }: Props = $props();
+  let { content, annotations, selectedLine, onLineClick, onLineDoubleClick, onAnnotationClick, onSelection, onSelectionClear }: Props = $props();
+
+  // Helper to find line number from element
+  function findLineNumber(node: Node): number | null {
+    let element = node;
+    while (element && element.nodeType !== Node.ELEMENT_NODE) {
+      element = element.parentNode as Node;
+    }
+    let lineElement = element as HTMLElement;
+    while (lineElement && !lineElement.id?.startsWith('line-')) {
+      lineElement = lineElement.parentElement as HTMLElement;
+    }
+    if (lineElement && lineElement.id) {
+      const num = parseInt(lineElement.id.replace('line-', ''), 10);
+      return isNaN(num) ? null : num;
+    }
+    return null;
+  }
+
+  // Handle text selection
+  function handleMouseUp(e: MouseEvent) {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
+
+    if (selectedText && selectedText.length > 0) {
+      const range = selection?.getRangeAt(0);
+      if (range) {
+        // Get start and end line numbers
+        const startLine = findLineNumber(range.startContainer);
+        const endLine = findLineNumber(range.endContainer);
+
+        if (startLine !== null && onSelection) {
+          // Get selection rectangle for tooltip positioning
+          const rect = range.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top;
+
+          // Only pass endLine if different from startLine
+          const finalEndLine = endLine !== null && endLine !== startLine ? endLine : undefined;
+          onSelection(startLine, finalEndLine, x, y);
+        }
+      }
+    } else {
+      // No selection, clear tooltip
+      onSelectionClear?.();
+    }
+  }
+
+  // Handle click to clear selection
+  function handleClick() {
+    // Small delay to allow selection check first
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const selectedText = selection?.toString().trim();
+      if (!selectedText) {
+        onSelectionClear?.();
+      }
+    }, 10);
+  }
 
   // Split content into lines
   let lines = $derived(content.split('\n'));
@@ -63,7 +124,7 @@
   }
 </script>
 
-<div class="font-mono text-sm">
+<div class="font-mono text-sm" onmouseup={handleMouseUp} onclick={handleClick}>
   {#each lines as line, i}
     {@const lineNum = i + 1}
     {@const markerType = getLineMarkerType(lineNum)}
@@ -72,8 +133,10 @@
     {@const hasAnnotations = lineAnnotations.length > 0}
 
     <div
-      class="flex group hover:bg-slate-800/50 cursor-pointer relative {isSelected ? 'bg-blue-900/30' : ''}"
+      id="line-{lineNum}"
+      class="flex group hover:bg-slate-800/50 cursor-pointer relative {isSelected ? 'bg-blue-900/30 ring-1 ring-blue-500/50' : ''}"
       onclick={() => onLineClick(lineNum)}
+      ondblclick={() => onLineDoubleClick(lineNum)}
       onkeydown={(e) => e.key === 'Enter' && onLineClick(lineNum)}
       role="button"
       tabindex="0"
@@ -104,6 +167,13 @@
           <span class="px-2 py-0.5 rounded-full text-xs {getBadgeClass(markerType)}">
             {lineAnnotations.length}
           </span>
+        </div>
+      {/if}
+
+      <!-- Selection hint (on hover, no annotation) -->
+      {#if !hasAnnotations}
+        <div class="absolute right-2 top-0 bottom-0 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <span class="text-xs text-slate-600">select text to annotate</span>
         </div>
       {/if}
     </div>

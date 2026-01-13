@@ -5,9 +5,15 @@
     annotation: Annotation;
     isSelected: boolean;
     onClick: () => void;
+    onResolve?: (id: string) => void;
   }
 
-  let { annotation, isSelected, onClick }: Props = $props();
+  let { annotation, isSelected, onClick, onResolve }: Props = $props();
+
+  function handleResolve(e: MouseEvent) {
+    e.stopPropagation();
+    onResolve?.(annotation.id);
+  }
 
   // Format timestamp
   function formatTime(timestamp: string): string {
@@ -46,9 +52,12 @@
   }
 </script>
 
-<button
-  class="w-full text-left p-3 rounded-lg border transition-all {getBorderClass(annotation.type, annotation.status === 'resolved')} {isSelected ? 'ring-2 ring-blue-500 bg-slate-800' : 'bg-slate-800/50 hover:bg-slate-800'} {annotation.status === 'resolved' ? 'opacity-60' : ''}"
+<div
+  class="w-full text-left p-3 rounded-lg border transition-all cursor-pointer {getBorderClass(annotation.type, annotation.status === 'resolved')} {isSelected ? 'ring-2 ring-blue-500 bg-slate-800' : 'bg-slate-800/50 hover:bg-slate-800'} {annotation.status === 'resolved' ? 'opacity-60' : ''}"
   onclick={onClick}
+  onkeydown={(e) => e.key === 'Enter' && onClick()}
+  role="button"
+  tabindex="0"
 >
   <!-- Header -->
   <div class="flex items-center justify-between mb-2">
@@ -87,4 +96,16 @@
       </span>
     </div>
   {/if}
-</button>
+
+  <!-- Resolve button (for open annotations) -->
+  {#if annotation.status === 'open' && onResolve}
+    <div class="mt-2 pt-2 border-t border-slate-700">
+      <button
+        class="w-full px-3 py-1.5 text-xs font-medium bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded transition-colors border border-green-600/30"
+        onclick={handleResolve}
+      >
+        Mark as Resolved
+      </button>
+    </div>
+  {/if}
+</div>

@@ -37,7 +37,7 @@
       "author": "ved",
       "timestamp": "2026-01-13T19:34:49.745Z",
       "content": "Web view is the exciting part!",
-      "status": "open",
+      "status": "resolved",
       "replies": []
     },
     {
@@ -67,7 +67,7 @@
       "author": "ved",
       "timestamp": "2026-01-13T20:35:08.204Z",
       "content": "[nit] Consider adding error handling here",
-      "status": "open",
+      "status": "resolved",
       "replies": []
     },
     {
@@ -84,6 +84,68 @@
       "content": "Security concern - needs review",
       "status": "resolved",
       "replies": []
+    },
+    {
+      "id": "4abbad62-363d-4a0d-8f3c-9ea2def0f97a",
+      "anchor": {
+        "line": 9,
+        "contextBefore": "\n### 1. Inline Annotations",
+        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
+        "contentHash": "003d669c3ab4"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:32:11.322Z",
+      "content": "argdvrad",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "ae93ab2c-c429-4414-8ee0-9bb59687ed0e",
+      "anchor": {
+        "line": 9,
+        "contextBefore": "\n### 1. Inline Annotations",
+        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
+        "contentHash": "003d669c3ab4"
+      },
+      "type": "suggestion",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:32:20.894Z",
+      "content": "asfvdafv",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "48d166ce-9041-465f-a77b-537c1b9487b3",
+      "anchor": {
+        "line": 10,
+        "endLine": 21,
+        "contextBefore": "### 1. Inline Annotations\n- Add comments to specific lines/sections in plans and markdown",
+        "contextAfter": "- Git-friendly (commit alongside source files)\n- Import/export for sharing outside git",
+        "contentHash": "9d7a293d521e"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:36:17.844Z",
+      "content": "asdfsa",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "5f971698-7214-4a66-ade9-34a37867f798",
+      "anchor": {
+        "line": 21,
+        "endLine": 29,
+        "contextBefore": "\n### 3. File-Based Team Sharing",
+        "contextAfter": "### 5. CLI Summary View\n- `/annotations` command to view all open items",
+        "contentHash": "2b612f6802db"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:36:30.977Z",
+      "content": "asdfasds",
+      "status": "open",
+      "replies": []
     }
   ],
   "approvals": [
@@ -96,8 +158,7 @@
     {
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "status": "approved",
-      "timestamp": "2026-01-13T20:44:41.874Z",
-      "comment": "Looks good to me!"
+      "timestamp": "2026-01-13T21:26:12.478Z"
     }
   ]
 }

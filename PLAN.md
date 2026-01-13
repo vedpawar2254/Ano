@@ -44,10 +44,22 @@ Structured comment types for clarity:
 ### 8. Web View & Annotator
 - Local web server for visual annotation interface
 - Render markdown/plans with inline annotation markers
-- Click-to-annotate: select text and add comments
+- **Smooth select-to-annotate**: Select text, tooltip appears, click to annotate
 - Real-time annotation sidebar showing all comments
 - Visual approval workflow (approve/reject buttons)
-- Share-able URLs for team review sessions
+- Jump-to-line when clicking annotations in sidebar
+
+### 9. Multi-File Support
+- Serve entire directories or multiple files at once
+- File browser sidebar to switch between files
+- Aggregate view of all annotations across files
+- `ano serve .` to serve current directory
+
+### 10. Sharing & Collaboration
+- Shareable URLs with annotation state
+- Export annotations as standalone HTML report
+- Diff view comparing annotation states between versions
+- Team activity feed showing recent annotations
 
 ## Technical Approach
 
@@ -139,20 +151,31 @@ When file changes, use context matching to relocate annotations to their new pos
 3. Title based authorization
 4. Export/import functionality for sharing
 
-### Phase 5: Web View & Annotator
-1. Build local web server (Express/Fastify)
+### Phase 5: Web View & Annotator ✓
+1. Build local web server (Node HTTP)
 2. Create web client (Svelte + Tailwind)
-   - Markdown renderer with annotation highlights
-   - Click-to-annotate text selection
+   - File viewer with annotation highlights
+   - Double-click to annotate
    - Annotation sidebar with threads
    - Approval buttons and status display
 3. `ano serve` command to launch web UI on localhost
-4. File watcher for real-time updates when annotation files change
 
-### Phase 6: Polish
-1. Annotation templates (concern, question, suggestion, blocker)
-2. Version diff tracking
-3. Summary views and statistics
+### Phase 6: Enhanced Web Annotation (Current)
+1. Smooth select-to-annotate with floating tooltip
+2. Multi-file support (`ano serve .`)
+3. File browser sidebar
+4. Real-time file watching
+
+### Phase 7: Sharing & Collaboration
+1. Shareable URLs with annotation state
+2. Export as standalone HTML report
+3. Diff view between versions
+4. Team activity feed
+
+### Phase 8: Polish
+1. Version diff tracking
+2. Summary views and statistics
+3. Keyboard shortcuts
 
 ## Remaining Considerations
 - Markdown formatting support in annotation content?

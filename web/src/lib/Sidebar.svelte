@@ -8,9 +8,10 @@
     approvals: Approval[];
     selectedAnnotation: Annotation | null;
     onAnnotationClick: (annotation: Annotation) => void;
+    onResolve: (annotationId: string) => void;
   }
 
-  let { annotations, approvals, selectedAnnotation, onAnnotationClick }: Props = $props();
+  let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve }: Props = $props();
 
   // Filter state
   let filter = $state<'all' | 'open' | 'blockers'>('all');
@@ -89,6 +90,7 @@
               {annotation}
               isSelected={selectedAnnotation?.id === annotation.id}
               onClick={() => onAnnotationClick(annotation)}
+              onResolve={onResolve}
             />
           {/each}
         </div>
