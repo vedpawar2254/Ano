@@ -29,12 +29,13 @@ import {
   readAnnotationFile,
 } from '../../core/annotations.js';
 import { getAuthorString, getUser } from '../../core/config.js';
+import { checkTeamMembership, readTeamConfig } from '../../core/team.js';
 
 // Create the command
 export const checkCommand = new Command('check')
   .description('Check if a file has required approvals (for hooks)')
   .argument('<file>', 'File to check')
-  .option('-r, --required <count>', 'Required number of approvals', '1')
+  .option('-r, --required <count>', 'Required number of approvals (default: from team config or 1)')
   .option('--allow-blockers', 'Allow open blockers (don\'t fail on them)')
   .option('-q, --quiet', 'Suppress output (just exit code)')
   .option('--json', 'Output as JSON')
@@ -44,7 +45,7 @@ export const checkCommand = new Command('check')
   .option('-o, --override', 'Override approval check (requires --reason)')
   .option('--reason <reason>', 'Reason for override (required with --override)')
   .action(async (file: string, options: {
-    required: string;
+    required?: string;
     allowBlockers: boolean;
     quiet: boolean;
     json: boolean;
@@ -54,7 +55,19 @@ export const checkCommand = new Command('check')
   }) => {
     try {
       const filePath = resolve(file);
-      const requiredCount = parseInt(options.required, 10);
+
+      // Load team config first to get default requirements
+      const teamConfig = await readTeamConfig();
+
+      // Priority: CLI flag > team config > default (1)
+      let requiredCount: number;
+      if (options.required !== undefined) {
+        requiredCount = parseInt(options.required, 10);
+      } else if (teamConfig?.requirements.minApprovals) {
+        requiredCount = teamConfig.requirements.minApprovals;
+      } else {
+        requiredCount = 1;
+      }
 
       // Handle override
       if (options.override) {
@@ -124,11 +137,50 @@ export const checkCommand = new Command('check')
 
       const passed = hasEnoughApprovals && hasNoBlockers && noChangesRequested;
 
+      // Check team membership for each approver (teamConfig already loaded above)
+      const approversWithTeam = await Promise.all(
+        approvals.map(async (a) => {
+          // Try multiple formats to match team membership:
+          // 1. "Name <email>" format - extract email
+          // 2. Plain email "user@example.com"
+          // 3. Plain name "ved" - try to match against team member names
+          const emailMatch = a.author.match(/<(.+?)>/);
+          let membership: { isMember: boolean; member?: any; role?: any } = { isMember: false };
+
+          if (emailMatch) {
+            // Format: "Name <email>" - use email
+            membership = await checkTeamMembership(emailMatch[1]);
+          } else if (a.author.includes('@')) {
+            // Format: plain email
+            membership = await checkTeamMembership(a.author);
+          } else if (teamConfig) {
+            // Format: plain name - try to find by name (case-insensitive)
+            const memberByName = teamConfig.members.find(
+              m => m.name.toLowerCase() === a.author.toLowerCase()
+            );
+            if (memberByName) {
+              membership = await checkTeamMembership(memberByName.email);
+            }
+          }
+
+          const { isMember, member, role } = membership;
+          return {
+            author: a.author,
+            title: a.title,
+            status: a.status,
+            isMember,
+            role: member?.role,
+            canOverride: role?.canOverride,
+          };
+        })
+      );
+
       // Build result
       const result = {
         approved: passed,
         softMode: options.soft,
         file: filePath,
+        hasTeamConfig: !!teamConfig,
         approvals: {
           required: requiredCount,
           received: approvedCount,
@@ -142,11 +194,7 @@ export const checkCommand = new Command('check')
             content: b.content,
           })),
         },
-        approvers: approvals.map(a => ({
-          author: a.author,
-          title: a.title,
-          status: a.status,
-        })),
+        approvers: approversWithTeam,
       };
 
       // Output
@@ -198,9 +246,17 @@ async function logOverride(file: string, author: string, reason: string): Promis
 function printResult(result: {
   approved: boolean;
   softMode?: boolean;
+  hasTeamConfig?: boolean;
   approvals: { required: number; received: number; changesRequested: number };
   blockers: { count: number; items: Array<{ line: number; author: string; content: string }> };
-  approvers: Array<{ author: string; title?: string; status: string }>;
+  approvers: Array<{
+    author: string;
+    title?: string;
+    status: string;
+    isMember?: boolean;
+    role?: string;
+    canOverride?: boolean;
+  }>;
 }, requiredCount: number, softMode: boolean): void {
   console.log();
 
@@ -241,8 +297,20 @@ function printResult(result: {
       const icon = approver.status === 'approved'
         ? chalk.green('✓')
         : chalk.red('✗');
-      const title = approver.title ? chalk.dim(` (${approver.title})`) : '';
-      console.log(`    ${icon} ${approver.author}${title}`);
+      const title = approver.title ? ` (${approver.title})` : '';
+
+      // Team membership info (advisory)
+      let teamInfo = '';
+      if (result.hasTeamConfig) {
+        if (approver.isMember) {
+          const overrideTag = approver.canOverride ? ', can override' : '';
+          teamInfo = chalk.cyan(` [${approver.role}${overrideTag}]`);
+        } else {
+          teamInfo = chalk.yellow(' [not in team]');
+        }
+      }
+
+      console.log(`    ${icon} ${approver.author}${chalk.dim(title)}${teamInfo}`);
     }
   }
 

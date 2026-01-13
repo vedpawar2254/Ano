@@ -156,7 +156,7 @@ export async function getUser(): Promise<UserConfig> {
  */
 export async function getAuthorString(): Promise<string> {
   const user = await getUser();
-  return user.name;
+  return `${user.name} <${user.email}>`;
 }
 
 /**

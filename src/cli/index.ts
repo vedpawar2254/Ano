@@ -24,6 +24,8 @@ import {
   blockCommand,
   questionCommand,
 } from './commands/quick.js';
+import { teamCommand } from './commands/team.js';
+import { replyCommand, deleteCommand, syncCommand } from './commands/manage.js';
 
 // Create the main program
 const program = new Command();
@@ -46,6 +48,14 @@ program.addCommand(shipitCommand);
 program.addCommand(nitCommand);
 program.addCommand(blockCommand);
 program.addCommand(questionCommand);
+
+// Team management
+program.addCommand(teamCommand);
+
+// Annotation management
+program.addCommand(replyCommand);
+program.addCommand(deleteCommand);
+program.addCommand(syncCommand);
 
 // Parse arguments and run
 program.parse();

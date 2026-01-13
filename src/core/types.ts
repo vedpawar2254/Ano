@@ -167,6 +167,69 @@ export interface AnnotationFile {
 }
 
 // ============================================
+// Team Configuration
+// ============================================
+
+/**
+ * A team member in the config
+ */
+export interface TeamMember {
+  /** Display name */
+  name: string;
+
+  /** Email (used to match git identity) */
+  email: string;
+
+  /** Role in the team */
+  role: string;
+}
+
+/**
+ * Role definition with permissions
+ */
+export interface TeamRole {
+  /** Can this role override approval checks? */
+  canOverride: boolean;
+
+  /** Weight of approval (e.g., lead = 2, reviewer = 1) */
+  weight: number;
+}
+
+/**
+ * Approval requirements for the project
+ */
+export interface ApprovalRequirements {
+  /** Minimum number of approvals needed */
+  minApprovals: number;
+
+  /** Minimum total weight needed (optional) */
+  minWeight?: number;
+
+  /** Specific roles that must approve (optional) */
+  requiredRoles?: string[];
+}
+
+/**
+ * Team configuration stored in .ano/config.json
+ */
+export interface TeamConfig {
+  /** Config schema version */
+  version: string;
+
+  /** Project name (optional) */
+  projectName?: string;
+
+  /** Team members */
+  members: TeamMember[];
+
+  /** Role definitions */
+  roles: Record<string, TeamRole>;
+
+  /** Approval requirements */
+  requirements: ApprovalRequirements;
+}
+
+// ============================================
 // Utility Types
 // ============================================
 

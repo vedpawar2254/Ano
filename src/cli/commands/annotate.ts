@@ -15,7 +15,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve } from 'node:path';
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { addAnnotation } from '../../core/annotations.js';
 import { getAuthorString } from '../../core/config.js';
 import type { AnnotationType, CreateAnnotationOptions } from '../../core/types.js';
@@ -66,6 +66,18 @@ export const annotateCommand = new Command('annotate')
         await access(file);
       } catch {
         console.error(chalk.red(`Error: File not found: ${file}`));
+        process.exit(1);
+      }
+
+      // Validate line number exists in file
+      const content = await readFile(file, 'utf-8');
+      const lineCount = content.split('\n').length;
+      if (line < 1 || line > lineCount) {
+        console.error(chalk.red(`Error: Line ${line} is out of range. File has ${lineCount} lines.`));
+        process.exit(1);
+      }
+      if (endLine && (endLine < line || endLine > lineCount)) {
+        console.error(chalk.red(`Error: End line ${endLine} is invalid. Must be >= ${line} and <= ${lineCount}.`));
         process.exit(1);
       }
 

@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "projectName": "Ano Project",
+  "members": [
+    {
+      "name": "ved",
+      "email": "ved.pawar2024@nst.rishihood.edu.in",
+      "role": "lead"
+    },
+    {
+      "name": "Alice Smith",
+      "email": "alice@example.com",
+      "role": "reviewer"
+    }
+  ],
+  "roles": {
+    "lead": {
+      "canOverride": true,
+      "weight": 2
+    },
+    "reviewer": {
+      "canOverride": false,
+      "weight": 1
+    }
+  },
+  "requirements": {
+    "minApprovals": 1
+  }
+}

@@ -16,7 +16,14 @@
       "timestamp": "2026-01-13T19:34:43.619Z",
       "content": "Should we add more annotation types?",
       "status": "resolved",
-      "replies": []
+      "replies": [
+        {
+          "id": "e3a419c5-76cf-494a-a901-c796eb3fbae6",
+          "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+          "timestamp": "2026-01-13T20:57:17.726Z",
+          "content": "Good question!"
+        }
+      ]
     },
     {
       "id": "1d9cb93b-da42-4131-a621-8114ae2e48c2",
@@ -84,6 +91,12 @@
       "author": "ved",
       "status": "approved",
       "timestamp": "2026-01-13T20:35:07.141Z",
+      "comment": "Looks good to me!"
+    },
+    {
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "status": "approved",
+      "timestamp": "2026-01-13T20:44:41.874Z",
       "comment": "Looks good to me!"
     }
   ]
