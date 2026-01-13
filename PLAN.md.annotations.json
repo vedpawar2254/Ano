@@ -62,6 +62,21 @@
       "content": "[nit] Consider adding error handling here",
       "status": "open",
       "replies": []
+    },
+    {
+      "id": "0f256b1e-4523-42b5-b5a8-04f02f10384f",
+      "anchor": {
+        "line": 25,
+        "contextBefore": "- Import/export for sharing outside git\n",
+        "contextAfter": "- Claude can read annotations when asked\n- Claude can respond to and address feedback",
+        "contentHash": "05ded3c09550"
+      },
+      "type": "blocker",
+      "author": "ved",
+      "timestamp": "2026-01-13T20:35:31.762Z",
+      "content": "Security concern - needs review",
+      "status": "resolved",
+      "replies": []
     }
   ],
   "approvals": [

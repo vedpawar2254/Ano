@@ -35,7 +35,7 @@ export const checkCommand = new Command('check')
   .description('Check if a file has required approvals (for hooks)')
   .argument('<file>', 'File to check')
   .option('-r, --required <count>', 'Required number of approvals', '1')
-  .option('-b, --no-blockers', 'Fail if there are open blockers')
+  .option('--allow-blockers', 'Allow open blockers (don\'t fail on them)')
   .option('-q, --quiet', 'Suppress output (just exit code)')
   .option('--json', 'Output as JSON')
   // NEW: Soft gate mode
@@ -45,7 +45,7 @@ export const checkCommand = new Command('check')
   .option('--reason <reason>', 'Reason for override (required with --override)')
   .action(async (file: string, options: {
     required: string;
-    blockers: boolean;
+    allowBlockers: boolean;
     quiet: boolean;
     json: boolean;
     soft: boolean;
@@ -119,7 +119,7 @@ export const checkCommand = new Command('check')
 
       // Determine pass/fail
       const hasEnoughApprovals = approvedCount >= requiredCount;
-      const hasNoBlockers = options.blockers ? true : openBlockers.length === 0;
+      const hasNoBlockers = options.allowBlockers ? true : openBlockers.length === 0;
       const noChangesRequested = changesRequested === 0;
 
       const passed = hasEnoughApprovals && hasNoBlockers && noChangesRequested;

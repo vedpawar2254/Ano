@@ -91,6 +91,7 @@ The hook receives these variables:
 
 ## Commands Reference
 
+### Check Command
 ```bash
 # Check with default (1 approval needed)
 ano check plan.md
@@ -98,12 +99,37 @@ ano check plan.md
 # Require 2 approvals
 ano check plan.md --required 2
 
-# Also fail if open blockers exist
-ano check plan.md --no-blockers
+# Allow open blockers (don't fail on them)
+ano check plan.md --allow-blockers
 
 # Quiet mode (just exit code, for hooks)
 ano check plan.md --quiet
 
 # JSON output (for scripting)
 ano check plan.md --json
+
+# Soft mode (warn but don't block)
+ano check plan.md --soft
+
+# Override with reason (bypasses checks, logged for audit)
+ano check plan.md --override --reason "hotfix for prod"
+```
+
+### Quick Annotation Shortcuts
+```bash
+# Quick approve
+ano lgtm plan.md
+ano lgtm plan.md -m "Great work!"
+
+# Strong approve (ship it!)
+ano shipit plan.md
+
+# Quick nitpick (won't block)
+ano nit plan.md:15 "Consider renaming this variable"
+
+# Add blocker (will block execution)
+ano block plan.md:25 "Security concern - needs review"
+
+# Quick question
+ano q plan.md:30 "Why did we choose this approach?"
 ```
