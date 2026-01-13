@@ -1,0 +1,24 @@
+{
+  "name": "ano",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for collaborative annotation and review",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ano": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": ["claude-code", "annotation", "review", "collaboration","ano","claude-code-plugin","mcp","claude-code-extension"],
+  "author": "Ved Pawar <ved.pawar2024@rishihood.edu.in>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.0.8",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

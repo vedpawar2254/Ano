@@ -99,6 +99,7 @@ Structured comment types for clarity:
 - **MVP scope**: Full team workflow - include approvals, templates, and sharing from start
 - **Web deployment**: Local only - runs on localhost, team syncs via git
 - **Frontend**: Svelte + Tailwind for lightweight, fast UI
+- **Authentication**: None required - uses git identity (`git config user.name` / `user.email`)
 
 ## Annotation Anchoring Strategy
 ```json
