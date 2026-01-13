@@ -146,6 +146,38 @@
       "content": "asdfasds",
       "status": "open",
       "replies": []
+    },
+    {
+      "id": "631f7a50-7f80-445f-a21a-7d9d810f9084",
+      "anchor": {
+        "line": 4,
+        "endLine": 9,
+        "contextBefore": "\n## Vision",
+        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
+        "contentHash": "f29f7870db2b"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:42:38.974Z",
+      "content": "asdasd",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "56f0cea0-8fc8-49d3-9414-0a35c7a3ad02",
+      "anchor": {
+        "line": 4,
+        "endLine": 15,
+        "contextBefore": "\n## Vision",
+        "contextAfter": "- `question` - Clarification needed\n- `suggestion` - Improvement idea",
+        "contentHash": "1d438f07bc40"
+      },
+      "type": "blocker",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-13T21:42:48.679Z",
+      "content": "asdfvadfvc",
+      "status": "resolved",
+      "replies": []
     }
   ],
   "approvals": [

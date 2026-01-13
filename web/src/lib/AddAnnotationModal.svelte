@@ -4,11 +4,12 @@
   interface Props {
     line: number;
     endLine?: number;
+    selectedText?: string;
     onSubmit: (line: number, content: string, type: AnnotationType, endLine?: number) => void;
     onCancel: () => void;
   }
 
-  let { line, endLine, onSubmit, onCancel }: Props = $props();
+  let { line, endLine, selectedText, onSubmit, onCancel }: Props = $props();
 
   let content = $state('');
   let type = $state<AnnotationType>('concern');
@@ -29,26 +30,33 @@
 
   // Line display
   let lineDisplay = $derived(endLine && endLine !== line ? `${line}-${endLine}` : `${line}`);
+
+  // Truncate selected text for display
+  let displayText = $derived(() => {
+    if (!selectedText) return '';
+    const text = selectedText.trim();
+    if (text.length > 60) return text.slice(0, 57) + '...';
+    return text;
+  });
 </script>
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onCancel()} />
 
-<!-- Backdrop -->
+<!-- Floating modal (no backdrop) -->
 <div
-  class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
-  onclick={onCancel}
+  class="fixed z-50 bg-slate-800 rounded-2xl shadow-2xl border border-slate-600 w-72"
+  style="left: 50%; top: 40%; transform: translate(-50%, -50%);"
   role="dialog"
   aria-modal="true"
-  tabindex="-1"
-  onkeydown={(e) => e.key === 'Escape' && onCancel()}
 >
-  <!-- Modal -->
-  <div
-    class="bg-slate-800/95 backdrop-blur rounded-2xl shadow-2xl border border-slate-600/50 w-72"
-    onclick={(e) => e.stopPropagation()}
-    role="presentation"
-  >
     <div class="p-3">
+      <!-- Selected text preview -->
+      {#if selectedText}
+        <div class="mb-2 px-2 py-1.5 bg-slate-900/60 rounded-lg border-l-2 border-blue-500/50">
+          <p class="text-[10px] text-slate-400 truncate italic">"{displayText()}"</p>
+        </div>
+      {/if}
+
       <!-- Header row -->
       <div class="flex items-center gap-2 mb-2.5">
         <span class="text-[11px] text-slate-400 bg-slate-700/50 px-1.5 py-0.5 rounded">L{lineDisplay}</span>
@@ -88,5 +96,4 @@
         </button>
       </form>
     </div>
-  </div>
 </div>

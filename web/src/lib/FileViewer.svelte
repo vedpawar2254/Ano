@@ -8,7 +8,7 @@
     onLineClick: (line: number) => void;
     onLineDoubleClick: (line: number) => void;
     onAnnotationClick: (annotation: Annotation) => void;
-    onSelection?: (line: number, endLine: number | undefined, x: number, y: number) => void;
+    onSelection?: (line: number, endLine: number | undefined, x: number, y: number, selectedText: string) => void;
     onSelectionClear?: () => void;
   }
 
@@ -51,7 +51,7 @@
 
           // Only pass endLine if different from startLine
           const finalEndLine = endLine !== null && endLine !== startLine ? endLine : undefined;
-          onSelection(startLine, finalEndLine, x, y);
+          onSelection(startLine, finalEndLine, x, y, selectedText);
         }
       }
     } else {
