@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ano": {
+      "command": "node",
+      "args": ["/Users/vedpawar2254/Desktop/personalP/ano/dist/mcp/server.js"],
+      "env": {}
+    }
+  }
+}
