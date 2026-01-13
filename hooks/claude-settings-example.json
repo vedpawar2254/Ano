@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ano": {
+      "command": "node",
+      "args": ["/Users/vedpawar2254/Desktop/personalP/ano/dist/mcp/server.js"]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "command": "echo 'Checking approvals before write...' && node /Users/vedpawar2254/Desktop/personalP/ano/dist/cli/index.js check PLAN.md --quiet"
+      }
+    ]
+  }
+}

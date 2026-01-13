@@ -32,6 +32,21 @@
       "content": "Web view is the exciting part!",
       "status": "open",
       "replies": []
+    },
+    {
+      "id": "f43fef07-6f51-4ee8-93a4-06330c516299",
+      "anchor": {
+        "line": 50,
+        "contextBefore": "- Real-time annotation sidebar showing all comments\n- Visual approval workflow (approve/reject buttons)",
+        "contextAfter": "\n## Technical Approach",
+        "contentHash": "382435eea301"
+      },
+      "type": "blocker",
+      "author": "ved",
+      "timestamp": "2026-01-13T20:17:37.655Z",
+      "content": "STOP! This needs security review",
+      "status": "resolved",
+      "replies": []
     }
   ],
   "approvals": [
