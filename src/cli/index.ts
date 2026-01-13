@@ -16,6 +16,7 @@ import { annotateCommand } from './commands/annotate.js';
 import { listCommand } from './commands/list.js';
 import { resolveCommand } from './commands/resolve.js';
 import { approveCommand } from './commands/approve.js';
+import { checkCommand } from './commands/check.js';
 
 // Create the main program
 const program = new Command();
@@ -30,6 +31,7 @@ program.addCommand(annotateCommand);
 program.addCommand(listCommand);
 program.addCommand(resolveCommand);
 program.addCommand(approveCommand);
+program.addCommand(checkCommand);
 
 // Parse arguments and run
 program.parse();

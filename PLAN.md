@@ -136,7 +136,8 @@ When file changes, use context matching to relocate annotations to their new pos
 ### Phase 4: Team Workflow
 1. Approval gate hook (pre-plan-execute)
 2. Author tracking in annotations
-3. Export/import functionality for sharing
+3. Title based authorization
+4. Export/import functionality for sharing
 
 ### Phase 5: Web View & Annotator
 1. Build local web server (Express/Fastify)
