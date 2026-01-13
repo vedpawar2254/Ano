@@ -17,6 +17,13 @@ import { listCommand } from './commands/list.js';
 import { resolveCommand } from './commands/resolve.js';
 import { approveCommand } from './commands/approve.js';
 import { checkCommand } from './commands/check.js';
+import {
+  lgtmCommand,
+  shipitCommand,
+  nitCommand,
+  blockCommand,
+  questionCommand,
+} from './commands/quick.js';
 
 // Create the main program
 const program = new Command();
@@ -32,6 +39,13 @@ program.addCommand(listCommand);
 program.addCommand(resolveCommand);
 program.addCommand(approveCommand);
 program.addCommand(checkCommand);
+
+// Quick annotation shortcuts
+program.addCommand(lgtmCommand);
+program.addCommand(shipitCommand);
+program.addCommand(nitCommand);
+program.addCommand(blockCommand);
+program.addCommand(questionCommand);
 
 // Parse arguments and run
 program.parse();

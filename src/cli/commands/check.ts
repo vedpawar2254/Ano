@@ -8,23 +8,27 @@
  *   ano check <file> [options]
  *
  * Exit codes:
- *   0 = Has required approvals (or no annotations exist)
+ *   0 = Has required approvals (or overridden)
  *   1 = Missing required approvals (blocks execution)
  *
+ * Modes:
+ *   --soft      Warn but don't block (exit 0 even if checks fail)
+ *   --override  Bypass checks with a reason (logged for audit)
+ *
  * Examples:
- *   ano check plan.md                    # Need at least 1 approval
- *   ano check plan.md --required 2       # Need at least 2 approvals
- *   ano check plan.md --no-blockers      # Also check no open blockers
+ *   ano check plan.md                              # Standard check
+ *   ano check plan.md --soft                       # Warn only, don't block
+ *   ano check plan.md --override --reason "hotfix" # Bypass with reason
  */
 
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve } from 'node:path';
+import { appendFile } from 'node:fs/promises';
 import {
   readAnnotationFile,
-  getApprovals,
-  listAnnotations,
 } from '../../core/annotations.js';
+import { getAuthorString, getUser } from '../../core/config.js';
 
 // Create the command
 export const checkCommand = new Command('check')
@@ -34,15 +38,56 @@ export const checkCommand = new Command('check')
   .option('-b, --no-blockers', 'Fail if there are open blockers')
   .option('-q, --quiet', 'Suppress output (just exit code)')
   .option('--json', 'Output as JSON')
+  // NEW: Soft gate mode
+  .option('-s, --soft', 'Soft gate: warn but don\'t block (always exit 0)')
+  // NEW: Override with reason
+  .option('-o, --override', 'Override approval check (requires --reason)')
+  .option('--reason <reason>', 'Reason for override (required with --override)')
   .action(async (file: string, options: {
     required: string;
     blockers: boolean;
     quiet: boolean;
     json: boolean;
+    soft: boolean;
+    override: boolean;
+    reason?: string;
   }) => {
     try {
       const filePath = resolve(file);
       const requiredCount = parseInt(options.required, 10);
+
+      // Handle override
+      if (options.override) {
+        if (!options.reason) {
+          console.error(chalk.red('Error: --override requires --reason'));
+          console.error(chalk.dim('  Example: ano check plan.md --override --reason "hotfix for prod"'));
+          process.exit(1);
+        }
+
+        const author = await getAuthorString();
+        await logOverride(filePath, author, options.reason);
+
+        if (!options.quiet) {
+          console.log(chalk.yellow.bold('  ⚠ OVERRIDE'));
+          console.log();
+          console.log(`  ${chalk.bold('Author:')} ${author}`);
+          console.log(`  ${chalk.bold('Reason:')} ${options.reason}`);
+          console.log();
+          console.log(chalk.dim('  Override logged to .ano-overrides.log'));
+        }
+
+        if (options.json) {
+          console.log(JSON.stringify({
+            approved: true,
+            override: true,
+            author,
+            reason: options.reason,
+            file: filePath,
+          }));
+        }
+
+        process.exit(0);
+      }
 
       // Get current state
       const annotationFile = await readAnnotationFile(filePath);
@@ -82,6 +127,7 @@ export const checkCommand = new Command('check')
       // Build result
       const result = {
         approved: passed,
+        softMode: options.soft,
         file: filePath,
         approvals: {
           required: requiredCount,
@@ -107,11 +153,15 @@ export const checkCommand = new Command('check')
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
       } else if (!options.quiet) {
-        printResult(result, requiredCount);
+        printResult(result, requiredCount, options.soft);
       }
 
-      // Exit code
-      process.exit(passed ? 0 : 1);
+      // Exit code - soft mode always exits 0
+      if (options.soft) {
+        process.exit(0);
+      } else {
+        process.exit(passed ? 0 : 1);
+      }
 
     } catch (error) {
       if (options.json) {
@@ -127,19 +177,38 @@ export const checkCommand = new Command('check')
   });
 
 /**
+ * Log override to audit file
+ */
+async function logOverride(file: string, author: string, reason: string): Promise<void> {
+  const logEntry = JSON.stringify({
+    timestamp: new Date().toISOString(),
+    file,
+    author,
+    reason,
+    action: 'override',
+  }) + '\n';
+
+  const logFile = resolve(process.cwd(), '.ano-overrides.log');
+  await appendFile(logFile, logEntry);
+}
+
+/**
  * Print human-readable result
  */
 function printResult(result: {
   approved: boolean;
+  softMode?: boolean;
   approvals: { required: number; received: number; changesRequested: number };
   blockers: { count: number; items: Array<{ line: number; author: string; content: string }> };
   approvers: Array<{ author: string; title?: string; status: string }>;
-}, requiredCount: number): void {
+}, requiredCount: number, softMode: boolean): void {
   console.log();
 
   // Header
   if (result.approved) {
     console.log(chalk.green.bold('  ✓ APPROVED'));
+  } else if (softMode) {
+    console.log(chalk.yellow.bold('  ⚠ WARNING (soft mode - proceeding anyway)'));
   } else {
     console.log(chalk.red.bold('  ✗ NOT APPROVED'));
   }
@@ -175,6 +244,12 @@ function printResult(result: {
       const title = approver.title ? chalk.dim(` (${approver.title})`) : '';
       console.log(`    ${icon} ${approver.author}${title}`);
     }
+  }
+
+  // Soft mode reminder
+  if (softMode && !result.approved) {
+    console.log();
+    console.log(chalk.yellow('  ⚠ Proceeding despite issues (soft mode)'));
   }
 
   console.log();

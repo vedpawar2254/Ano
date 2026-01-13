@@ -47,14 +47,29 @@
       "content": "STOP! This needs security review",
       "status": "resolved",
       "replies": []
+    },
+    {
+      "id": "a3a4ba5a-85d4-40ee-b351-6811e58ca5d0",
+      "anchor": {
+        "line": 10,
+        "contextBefore": "### 1. Inline Annotations\n- Add comments to specific lines/sections in plans and markdown",
+        "contextAfter": "- Mark comments as resolved/unresolved\n",
+        "contentHash": "bbe6d266ad20"
+      },
+      "type": "suggestion",
+      "author": "ved",
+      "timestamp": "2026-01-13T20:35:08.204Z",
+      "content": "[nit] Consider adding error handling here",
+      "status": "open",
+      "replies": []
     }
   ],
   "approvals": [
     {
       "author": "ved",
-      "title": "Developer",
       "status": "approved",
-      "timestamp": "2026-01-13T19:35:05.210Z"
+      "timestamp": "2026-01-13T20:35:07.141Z",
+      "comment": "Looks good to me!"
     }
   ]
 }
