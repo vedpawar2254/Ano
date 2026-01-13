@@ -26,6 +26,7 @@ import {
 } from './commands/quick.js';
 import { teamCommand } from './commands/team.js';
 import { replyCommand, deleteCommand, syncCommand } from './commands/manage.js';
+import { serveCommand } from './commands/serve.js';
 
 // Create the main program
 const program = new Command();
@@ -56,6 +57,9 @@ program.addCommand(teamCommand);
 program.addCommand(replyCommand);
 program.addCommand(deleteCommand);
 program.addCommand(syncCommand);
+
+// Web viewer
+program.addCommand(serveCommand);
 
 // Parse arguments and run
 program.parse();
