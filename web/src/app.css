@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Line highlight animation */
+@keyframes highlight-pulse {
+  0%, 100% { background-color: rgba(59, 130, 246, 0.1); }
+  50% { background-color: rgba(59, 130, 246, 0.2); }
+}
+
+.line-highlight {
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+/* Annotation marker styles */
+.annotation-marker {
+  @apply absolute -left-1 w-1 rounded-full cursor-pointer transition-all;
+}
+
+.annotation-marker:hover {
+  @apply w-2 -left-2;
+}
+
+.annotation-marker.concern { @apply bg-amber-500; }
+.annotation-marker.question { @apply bg-blue-500; }
+.annotation-marker.suggestion { @apply bg-green-500; }
+.annotation-marker.blocker { @apply bg-red-500; }
