@@ -1,4 +1,4 @@
-- [ ]terminal UI in the landing
+- [x]terminal UI in the landing
 - [ ] terminal features testing
 - [ ] claude code integration
 - [ ] test team features and update accordingly
