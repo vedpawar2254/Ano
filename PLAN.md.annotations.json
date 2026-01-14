@@ -144,7 +144,7 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-13T21:36:30.977Z",
       "content": "asdfasds",
-      "status": "open",
+      "status": "resolved",
       "replies": []
     },
     {
@@ -192,7 +192,7 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-13T21:47:31.228Z",
       "content": "hjbvjhbhjbubgubghbuyhbhgbubghb",
-      "status": "open",
+      "status": "resolved",
       "replies": []
     },
     {
@@ -208,6 +208,38 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-13T21:51:23.087Z",
       "content": "kjnjkbhjb",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "9707101d-4184-4a57-bcf3-2b49bbbe132b",
+      "anchor": {
+        "line": 19,
+        "endLine": 38,
+        "contextBefore": "- `suggestion` - Improvement idea\n- `blocker` - Must resolve before proceeding",
+        "contextAfter": "\n### 7. Version Diff",
+        "contentHash": "4c848f69e021"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-14T06:38:23.626Z",
+      "content": "ved's anotation",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "b656bb44-790e-4a77-b469-01fbb5cfe667",
+      "anchor": {
+        "line": 9,
+        "endLine": 24,
+        "contextBefore": "\n### 1. Inline Annotations",
+        "contextAfter": "### 4. Claude Integration\n- Claude can read annotations when asked",
+        "contentHash": "c23c8532b3db"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-14T06:39:11.992Z",
+      "content": "asdcsd",
       "status": "open",
       "replies": []
     }

@@ -16,6 +16,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { listAnnotations, getApprovals, readAnnotationFile } from '../../core/annotations.js';
 import type { Annotation, AnnotationType, AnnotationStatus, Approval } from '../../core/types.js';
 
@@ -27,11 +28,15 @@ export const listCommand = new Command('list')
   .option('-t, --type <type>', 'Filter by type: concern, question, suggestion, blocker')
   .option('-a, --author <author>', 'Filter by author')
   .option('--json', 'Output as JSON')
+  .option('--markdown', 'Output as markdown (for Claude Code)')
+  .option('--diff', 'Show file with inline annotations')
   .action(async (file: string, options: {
     status?: string;
     type?: string;
     author?: string;
     json?: boolean;
+    markdown?: boolean;
+    diff?: boolean;
   }) => {
     try {
       const filePath = resolve(file);
@@ -60,6 +65,20 @@ export const listCommand = new Command('list')
       // JSON output
       if (options.json) {
         console.log(JSON.stringify({ annotations, approvals }, null, 2));
+        return;
+      }
+
+      // Markdown output (for Claude Code)
+      if (options.markdown) {
+        const content = await readFile(filePath, 'utf-8');
+        printMarkdown(file, content, annotations, approvals);
+        return;
+      }
+
+      // Diff output (inline annotations)
+      if (options.diff) {
+        const content = await readFile(filePath, 'utf-8');
+        printDiff(file, content, annotations);
         return;
       }
 
@@ -179,4 +198,118 @@ function formatTypeBadge(type: AnnotationType): string {
     default:
       return type;
   }
+}
+
+/**
+ * Print markdown output for Claude Code integration.
+ */
+function printMarkdown(file: string, content: string, annotations: Annotation[], approvals: Approval[]): void {
+  const lines = content.split('\n');
+  const openAnnotations = annotations.filter(a => a.status === 'open');
+  const blockers = openAnnotations.filter(a => a.type === 'blocker');
+  const concerns = openAnnotations.filter(a => a.type === 'concern');
+  const questions = openAnnotations.filter(a => a.type === 'question');
+  const suggestions = openAnnotations.filter(a => a.type === 'suggestion');
+
+  console.log(`# Annotations for ${file}\n`);
+
+  // Summary
+  const approved = approvals.filter(a => a.status === 'approved').length;
+  console.log(`**Status:** ${openAnnotations.length} open, ${approved} approvals\n`);
+
+  if (blockers.length > 0) {
+    console.log(`## 🚫 Blockers (${blockers.length})\n`);
+    for (const a of blockers) {
+      const lineRef = a.anchor.endLine ? `L${a.anchor.line}-${a.anchor.endLine}` : `L${a.anchor.line}`;
+      const lineContent = lines[a.anchor.line - 1] || '';
+      console.log(`### ${lineRef}: ${a.content}`);
+      console.log(`> \`${lineContent.trim()}\``);
+      console.log(`— ${a.author.split('<')[0].trim()}\n`);
+    }
+  }
+
+  if (concerns.length > 0) {
+    console.log(`## ⚠️ Concerns (${concerns.length})\n`);
+    for (const a of concerns) {
+      const lineRef = a.anchor.endLine ? `L${a.anchor.line}-${a.anchor.endLine}` : `L${a.anchor.line}`;
+      const lineContent = lines[a.anchor.line - 1] || '';
+      console.log(`### ${lineRef}: ${a.content}`);
+      console.log(`> \`${lineContent.trim()}\``);
+      console.log(`— ${a.author.split('<')[0].trim()}\n`);
+    }
+  }
+
+  if (questions.length > 0) {
+    console.log(`## ❓ Questions (${questions.length})\n`);
+    for (const a of questions) {
+      const lineRef = a.anchor.endLine ? `L${a.anchor.line}-${a.anchor.endLine}` : `L${a.anchor.line}`;
+      const lineContent = lines[a.anchor.line - 1] || '';
+      console.log(`### ${lineRef}: ${a.content}`);
+      console.log(`> \`${lineContent.trim()}\``);
+      console.log(`— ${a.author.split('<')[0].trim()}\n`);
+    }
+  }
+
+  if (suggestions.length > 0) {
+    console.log(`## 💡 Suggestions (${suggestions.length})\n`);
+    for (const a of suggestions) {
+      const lineRef = a.anchor.endLine ? `L${a.anchor.line}-${a.anchor.endLine}` : `L${a.anchor.line}`;
+      const lineContent = lines[a.anchor.line - 1] || '';
+      console.log(`### ${lineRef}: ${a.content}`);
+      console.log(`> \`${lineContent.trim()}\``);
+      console.log(`— ${a.author.split('<')[0].trim()}\n`);
+    }
+  }
+
+  if (openAnnotations.length === 0) {
+    console.log(`No open annotations. All feedback has been addressed! ✅`);
+  }
+}
+
+/**
+ * Print diff-style output with inline annotations.
+ */
+function printDiff(file: string, content: string, annotations: Annotation[]): void {
+  const lines = content.split('\n');
+  const annotationMap = new Map<number, Annotation[]>();
+
+  for (const ann of annotations.filter(a => a.status === 'open')) {
+    const start = ann.anchor.line;
+    const end = ann.anchor.endLine || ann.anchor.line;
+    for (let i = start; i <= end; i++) {
+      if (!annotationMap.has(i)) annotationMap.set(i, []);
+      annotationMap.get(i)!.push(ann);
+    }
+  }
+
+  console.log();
+  console.log(chalk.bold(`  ${file}`));
+  console.log(chalk.dim('  ─'.repeat(40)));
+  console.log();
+
+  for (let i = 0; i < lines.length; i++) {
+    const lineNum = i + 1;
+    const lineAnnotations = annotationMap.get(lineNum) || [];
+    const numStr = String(lineNum).padStart(4, ' ');
+
+    if (lineAnnotations.length > 0) {
+      // Print line with highlight
+      console.log(chalk.yellow(`${numStr} │ `) + lines[i]);
+
+      // Print inline annotations
+      for (const ann of lineAnnotations) {
+        // Only show annotation on the first line of multi-line
+        if (ann.anchor.line === lineNum) {
+          const typeColor = ann.type === 'blocker' ? chalk.red :
+            ann.type === 'concern' ? chalk.yellow :
+            ann.type === 'question' ? chalk.blue : chalk.green;
+          console.log(chalk.dim('     │ ') + typeColor(`[${ann.type.toUpperCase()}] `) + ann.content);
+        }
+      }
+    } else {
+      console.log(chalk.dim(`${numStr} │ `) + lines[i]);
+    }
+  }
+
+  console.log();
 }

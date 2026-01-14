@@ -208,13 +208,144 @@ This is a sample plan file to demonstrate the annotation viewer.
     }
   }
 
+  // Export as standalone HTML
+  function handleExport() {
+    if (!fileContent || !annotationData) return;
+
+    const html = generateExportHtml(fileName, fileContent, annotationData);
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.annotated.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function generateExportHtml(name: string, content: string, data: AnnotationFile): string {
+    const lines = content.split('\n');
+    const annotationMap = new Map<number, typeof data.annotations>();
+
+    for (const ann of data.annotations) {
+      const start = ann.anchor.line;
+      const end = ann.anchor.endLine || ann.anchor.line;
+      for (let i = start; i <= end; i++) {
+        if (!annotationMap.has(i)) annotationMap.set(i, []);
+        annotationMap.get(i)!.push(ann);
+      }
+    }
+
+    const lineHtml = lines.map((line, i) => {
+      const lineNum = i + 1;
+      const lineAnnotations = annotationMap.get(lineNum) || [];
+      const hasAnnotation = lineAnnotations.length > 0;
+      const type = lineAnnotations[0]?.type || '';
+      const bgClass = hasAnnotation ? `annotation-${type}` : '';
+
+      const annotationHtml = lineAnnotations.length > 0 ? `
+        <div class="annotation-popup">
+          ${lineAnnotations.map(a => `
+            <div class="annotation-item ${a.type}">
+              <span class="type-badge">${a.type}</span>
+              <p>${escapeHtml(a.content)}</p>
+              <span class="author">${escapeHtml(a.author.split('<')[0].trim())}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : '';
+
+      return `<div class="line ${bgClass}" data-line="${lineNum}">
+        <span class="line-num">${lineNum}</span>
+        <span class="line-content">${escapeHtml(line) || '&nbsp;'}</span>
+        ${hasAnnotation ? `<span class="annotation-badge" onclick="this.parentElement.classList.toggle('show-popup')">${lineAnnotations.length}</span>` : ''}
+        ${annotationHtml}
+      </div>`;
+    }).join('\n');
+
+    const stats = {
+      open: data.annotations.filter(a => a.status === 'open').length,
+      blockers: data.annotations.filter(a => a.type === 'blocker' && a.status === 'open').length,
+      approvals: data.approvals.filter(a => a.status === 'approved').length
+    };
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <title>${escapeHtml(name)} - Annotations</title>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
+    .header { background: #1e293b; padding: 1rem 2rem; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.25rem; color: #60a5fa; display: flex; align-items: center; gap: 1rem; }
+    .header h1 span { color: #94a3b8; font-weight: normal; font-size: 0.875rem; }
+    .stats { display: flex; gap: 1.5rem; font-size: 0.875rem; }
+    .stats .stat { display: flex; align-items: center; gap: 0.5rem; }
+    .stats .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .stats .open .dot { background: #f59e0b; }
+    .stats .blocker .dot { background: #ef4444; }
+    .stats .approval .dot { background: #22c55e; }
+    .content { padding: 1rem; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 14px; }
+    .line { display: flex; align-items: flex-start; padding: 2px 0; position: relative; }
+    .line:hover { background: rgba(51, 65, 85, 0.5); }
+    .line-num { min-width: 50px; text-align: right; padding-right: 1rem; color: #64748b; user-select: none; border-right: 1px solid #334155; flex-shrink: 0; }
+    .line-content { padding-left: 1rem; white-space: pre-wrap; word-break: break-all; flex: 1; }
+    .annotation-badge { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 12px; margin-left: auto; cursor: pointer; flex-shrink: 0; }
+    .annotation-blocker { background: rgba(239, 68, 68, 0.1); }
+    .annotation-blocker .annotation-badge { background: #ef4444; }
+    .annotation-concern { background: rgba(245, 158, 11, 0.1); }
+    .annotation-concern .annotation-badge { background: #f59e0b; }
+    .annotation-question { background: rgba(59, 130, 246, 0.1); }
+    .annotation-suggestion { background: rgba(34, 197, 94, 0.1); }
+    .annotation-suggestion .annotation-badge { background: #22c55e; }
+    .annotation-popup { display: none; position: absolute; left: 60px; top: 100%; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 0.75rem; z-index: 100; min-width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .line.show-popup .annotation-popup { display: block; }
+    .annotation-item { margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #334155; }
+    .annotation-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .type-badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; }
+    .annotation-item.blocker .type-badge { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .annotation-item.concern .type-badge { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .annotation-item.question .type-badge { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .annotation-item.suggestion .type-badge { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .annotation-item p { font-size: 13px; margin: 4px 0; font-family: system-ui; }
+    .annotation-item .author { font-size: 11px; color: #64748b; }
+    .footer { padding: 1rem 2rem; text-align: center; color: #64748b; font-size: 12px; border-top: 1px solid #334155; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ano <span>${escapeHtml(name)}</span></h1>
+    <div class="stats">
+      <div class="stat open"><span class="dot"></span>${stats.open} open</div>
+      ${stats.blockers > 0 ? `<div class="stat blocker"><span class="dot"></span>${stats.blockers} blocker${stats.blockers !== 1 ? 's' : ''}</div>` : ''}
+      <div class="stat approval"><span class="dot"></span>${stats.approvals} approval${stats.approvals !== 1 ? 's' : ''}</div>
+    </div>
+  </div>
+  <div class="content">
+    ${lineHtml}
+  </div>
+  <div class="footer">
+    Generated by <a href="https://github.com/anthropics/ano" style="color: #60a5fa;">ano</a> • Click badges to view annotations
+  </div>
+</body>
+</html>`;
+  }
+
+  function escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   $effect(() => {
     loadData();
   });
 </script>
 
 <div class="h-screen flex flex-col">
-  <Header {fileName} {annotationData} onApprove={handleApprove} onRequestChanges={handleRequestChanges} />
+  <Header {fileName} {fileContent} {annotationData} onExport={handleExport} />
 
   <div class="flex-1 flex overflow-hidden">
     <div class="flex-1 overflow-auto" bind:this={fileViewerContainer}>
