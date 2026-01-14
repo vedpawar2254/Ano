@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 const commands = [
   {
@@ -69,19 +69,84 @@ export function QuickCommands() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {commands.map((cmd, index) => (
-            <motion.div
+            <CommandCard
               key={cmd.command}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.05 * index }}
-              className="p-4 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300"
-            >
-              <code className="text-emerald-400 text-sm font-mono">{cmd.command}</code>
-              <p className="text-zinc-500 text-xs mt-2">{cmd.description}</p>
-            </motion.div>
+              command={cmd.command}
+              description={cmd.description}
+              index={index}
+              isInView={isInView}
+            />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function CommandCard({
+  command,
+  description,
+  index,
+  isInView,
+}: {
+  command: string;
+  description: string;
+  index: number;
+  isInView: boolean;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: 0.05 * index }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      className="relative p-4 rounded-lg border border-zinc-800 bg-zinc-900/30 overflow-hidden transition-all duration-300 group"
+      style={{
+        boxShadow: isHovering
+          ? '0 0 20px rgba(16, 185, 129, 0.15)'
+          : 'none',
+      }}
+    >
+      {isHovering && (
+        <div
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          style={{
+            background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(16, 185, 129, 0.15), transparent 40%)`,
+          }}
+        />
+      )}
+      <div
+        className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: `radial-gradient(250px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(16, 185, 129, 0.4), transparent 100%)`,
+          mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          maskComposite: 'exclude',
+          WebkitMaskComposite: 'xor',
+          padding: '1px',
+        }}
+      />
+
+      <div className="relative z-10">
+        <code className="text-emerald-400 text-sm font-mono">{command}</code>
+        <p className="text-zinc-500 text-xs mt-2">{description}</p>
+      </div>
+    </motion.div>
   );
 }

@@ -13,6 +13,7 @@
 - [ ] realtime team colaboration
 - [ ] Also a "Send feedback" button to directly send feedback to claudecode
 - [ ] Auto call/ open web when plan is created by claudecode
+- [ ] AI anotations ? ( my say is no)
 
 
 
