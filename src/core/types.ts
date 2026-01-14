@@ -207,6 +207,9 @@ export interface ApprovalRequirements {
 
   /** Specific roles that must approve (optional) */
   requiredRoles?: string[];
+
+  /** Specific titles that must approve (optional, e.g., "Tech Lead", "Security") */
+  requiredTitles?: string[];
 }
 
 /**

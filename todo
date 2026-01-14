@@ -1,8 +1,8 @@
--  terminal UI in the landing
+- terminal UI in the landing
 - terminal features testing
 - claude code integration
-- test team features
-- edit and anotation web
+- test team features and update accordingly
+- [x] edit and anotation web
 - [x] sidebar in web needs to improve 
 - [x] better UI in the local web 
 - publish
@@ -10,3 +10,4 @@
 - issue tracker, docs, etc.
 - [x] remove UI friction
 - [ ] remove comments in code
+- [x] Shareable URLs with annotation state

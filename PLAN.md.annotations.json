@@ -190,6 +190,22 @@
       "content": "khjbnkjn",
       "status": "open",
       "replies": []
+    },
+    {
+      "id": "ae685ff7-95ba-409c-a087-109f0ce296f9",
+      "anchor": {
+        "line": 21,
+        "endLine": 29,
+        "contextBefore": "\n### 3. File-Based Team Sharing",
+        "contextAfter": "### 5. CLI Summary View\n- `/annotations` command to view all open items",
+        "contentHash": "5d215a44cc8f"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-14T08:32:55.227Z",
+      "content": "wedfwasfcasdf",
+      "status": "open",
+      "replies": []
     }
   ],
   "approvals": [

@@ -15,9 +15,10 @@
     files?: FileInfo[];
     onExport?: () => void;
     onFileSwitch?: (filePath: string) => void;
+    onCopyLink?: () => void;
   }
 
-  let { fileName, fileContent, annotationData, files = [], onExport, onFileSwitch }: Props = $props();
+  let { fileName, fileContent, annotationData, files = [], onExport, onFileSwitch, onCopyLink }: Props = $props();
 
   let copied = $state(false);
   let shareLink = $state('');
@@ -190,23 +191,10 @@
         <div class="absolute right-0 mt-2 w-48 bg-surface-900 rounded-lg border border-surface-800 py-1 z-50 shadow-xl">
           <button
             class="w-full px-3 py-2 text-left text-[13px] text-surface-300 hover:bg-surface-800 transition-colors"
-            onclick={createShareLink}
-            disabled={sharing}
+            onclick={() => { onCopyLink?.(); showMenu = false; }}
           >
-            {sharing ? 'Creating...' : shareLink ? 'Link copied' : 'Copy link'}
+            Copy link to view
           </button>
-
-          {#if shareLink}
-            <div class="px-3 py-2 border-t border-surface-800">
-              <input
-                type="text"
-                value={shareLink}
-                readonly
-                class="w-full px-2 py-1 text-[11px] bg-surface-950 border border-surface-800 rounded text-surface-400 font-mono"
-                onclick={(e) => (e.target as HTMLInputElement).select()}
-              />
-            </div>
-          {/if}
 
           <button
             class="w-full px-3 py-2 text-left text-[13px] text-surface-300 hover:bg-surface-800 transition-colors"

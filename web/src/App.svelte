@@ -43,6 +43,102 @@
   // Keyboard shortcuts help
   let showKeyboardHelp = $state(false);
 
+  // URL state management
+  function parseUrlState(): { file?: string; annotation?: string; line?: number } {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return {};
+
+    const params = new URLSearchParams(hash);
+    return {
+      file: params.get('file') || undefined,
+      annotation: params.get('annotation') || undefined,
+      line: params.get('line') ? parseInt(params.get('line')!, 10) : undefined
+    };
+  }
+
+  function updateUrlState(state: { file?: string; annotation?: string; line?: number }) {
+    const params = new URLSearchParams();
+    if (state.file) params.set('file', state.file);
+    if (state.annotation) params.set('annotation', state.annotation);
+    else if (state.line) params.set('line', state.line.toString());
+
+    const hash = params.toString();
+    const newUrl = hash ? `#${hash}` : window.location.pathname;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  function getShareableUrl(): string {
+    const base = window.location.origin + window.location.pathname;
+    const params = new URLSearchParams();
+
+    // Add file if in multi-file mode
+    const currentFile = files.find(f => f.isCurrent);
+    if (files.length > 1 && currentFile) {
+      params.set('file', currentFile.path);
+    }
+
+    // Add annotation or line
+    if (selectedAnnotation) {
+      params.set('annotation', selectedAnnotation.id);
+    } else if (selectedLine) {
+      params.set('line', selectedLine.toString());
+    }
+
+    const hash = params.toString();
+    return hash ? `${base}#${hash}` : base;
+  }
+
+  async function copyShareableUrl() {
+    const url = getShareableUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      showCopyToast = true;
+      setTimeout(() => showCopyToast = false, 2000);
+    } catch (e) {
+      console.error('Failed to copy URL:', e);
+    }
+  }
+
+  let showCopyToast = $state(false);
+
+  // Apply URL state after data is loaded
+  async function applyUrlState() {
+    const state = parseUrlState();
+
+    // Switch file if specified
+    if (state.file) {
+      const targetFile = files.find(f => f.path === state.file || f.name === state.file);
+      if (targetFile && !targetFile.isCurrent) {
+        await handleFileSwitch(targetFile.path);
+      }
+    }
+
+    // Select annotation if specified
+    if (state.annotation && annotationData) {
+      const annotation = annotationData.annotations.find(a => a.id === state.annotation);
+      if (annotation) {
+        handleAnnotationClick(annotation);
+        return;
+      }
+    }
+
+    // Select line if specified
+    if (state.line) {
+      selectedLine = state.line;
+      setTimeout(() => scrollToLine(state.line!), 100);
+    }
+  }
+
+  // Update URL when selection changes
+  $effect(() => {
+    const currentFile = files.find(f => f.isCurrent);
+    updateUrlState({
+      file: files.length > 1 && currentFile ? currentFile.path : undefined,
+      annotation: selectedAnnotation?.id,
+      line: !selectedAnnotation && selectedLine ? selectedLine : undefined
+    });
+  });
+
   // Load files list from API
   async function loadFiles() {
     try {
@@ -597,15 +693,23 @@ This is a sample plan file to demonstrate the annotation viewer.
   }
 
   $effect(() => {
-    loadData();
-    loadFiles();
+    // Load data and apply URL state
+    Promise.all([loadData(), loadFiles()]).then(() => {
+      // Apply URL state after data is loaded
+      setTimeout(() => applyUrlState(), 100);
+    });
     setupSSE();
+
+    // Listen for hash changes
+    const handleHashChange = () => applyUrlState();
+    window.addEventListener('hashchange', handleHashChange);
 
     // Cleanup on unmount
     return () => {
       if (eventSource) {
         eventSource.close();
       }
+      window.removeEventListener('hashchange', handleHashChange);
     };
   });
 </script>
@@ -613,7 +717,7 @@ This is a sample plan file to demonstrate the annotation viewer.
 <svelte:window onkeydown={handleKeydown} />
 
 <div class="h-screen flex flex-col bg-surface-950">
-  <Header {fileName} {fileContent} {annotationData} {files} onExport={handleExport} onFileSwitch={handleFileSwitch} />
+  <Header {fileName} {fileContent} {annotationData} {files} onExport={handleExport} onFileSwitch={handleFileSwitch} onCopyLink={copyShareableUrl} />
 
   <div class="flex-1 flex overflow-hidden">
     <div class="flex-1 overflow-auto" bind:this={fileViewerContainer}>
@@ -738,5 +842,11 @@ This is a sample plan file to demonstrate the annotation viewer.
         </div>
       </div>
     </div>
+  </div>
+{/if}
+
+{#if showCopyToast}
+  <div class="fixed bottom-4 right-4 bg-surface-800 border border-surface-700 rounded-lg px-4 py-2 shadow-xl z-50 text-[13px] text-surface-200">
+    Link copied to clipboard
   </div>
 {/if}

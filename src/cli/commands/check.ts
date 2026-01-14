@@ -39,9 +39,12 @@ export const checkCommand = new Command('check')
   .option('--allow-blockers', 'Allow open blockers (don\'t fail on them)')
   .option('-q, --quiet', 'Suppress output (just exit code)')
   .option('--json', 'Output as JSON')
-  // NEW: Soft gate mode
+  // Title/role-based requirements
+  .option('--require-title <titles...>', 'Require approval from users with specific titles (e.g., "Tech Lead" "Security")')
+  .option('--require-role <roles...>', 'Require approval from team members with specific roles')
+  // Soft gate mode
   .option('-s, --soft', 'Soft gate: warn but don\'t block (always exit 0)')
-  // NEW: Override with reason
+  // Override with reason
   .option('-o, --override', 'Override approval check (requires --reason)')
   .option('--reason <reason>', 'Reason for override (required with --override)')
   .action(async (file: string, options: {
@@ -49,6 +52,8 @@ export const checkCommand = new Command('check')
     allowBlockers: boolean;
     quiet: boolean;
     json: boolean;
+    requireTitle?: string[];
+    requireRole?: string[];
     soft: boolean;
     override: boolean;
     reason?: string;
@@ -130,14 +135,17 @@ export const checkCommand = new Command('check')
         a => a.type === 'blocker' && a.status === 'open'
       );
 
-      // Determine pass/fail
-      const hasEnoughApprovals = approvedCount >= requiredCount;
-      const hasNoBlockers = options.allowBlockers ? true : openBlockers.length === 0;
-      const noChangesRequested = changesRequested === 0;
+      // Check required titles
+      const requiredTitles = options.requireTitle || teamConfig?.requirements.requiredTitles || [];
+      const approvedTitles = approvals
+        .filter(a => a.status === 'approved' && a.title)
+        .map(a => a.title!.toLowerCase());
+      const missingTitles = requiredTitles.filter(
+        t => !approvedTitles.includes(t.toLowerCase())
+      );
+      const hasRequiredTitles = missingTitles.length === 0;
 
-      const passed = hasEnoughApprovals && hasNoBlockers && noChangesRequested;
-
-      // Check team membership for each approver (teamConfig already loaded above)
+      // Check team membership for each approver (needed for role checks)
       const approversWithTeam = await Promise.all(
         approvals.map(async (a) => {
           // Try multiple formats to match team membership:
@@ -175,6 +183,23 @@ export const checkCommand = new Command('check')
         })
       );
 
+      // Check required roles (from team config)
+      const requiredRoles = options.requireRole || teamConfig?.requirements.requiredRoles || [];
+      const approverRoles = approversWithTeam
+        .filter(a => a.status === 'approved' && a.isMember && a.role)
+        .map(a => a.role!.toLowerCase());
+      const missingRoles = requiredRoles.filter(
+        r => !approverRoles.includes(r.toLowerCase())
+      );
+      const hasRequiredRoles = missingRoles.length === 0;
+
+      // Determine pass/fail
+      const hasEnoughApprovals = approvedCount >= requiredCount;
+      const hasNoBlockers = options.allowBlockers ? true : openBlockers.length === 0;
+      const noChangesRequested = changesRequested === 0;
+
+      const passed = hasEnoughApprovals && hasNoBlockers && noChangesRequested && hasRequiredTitles && hasRequiredRoles;
+
       // Build result
       const result = {
         approved: passed,
@@ -193,6 +218,14 @@ export const checkCommand = new Command('check')
             author: b.author,
             content: b.content,
           })),
+        },
+        titles: {
+          required: requiredTitles,
+          missing: missingTitles,
+        },
+        roles: {
+          required: requiredRoles,
+          missing: missingRoles,
         },
         approvers: approversWithTeam,
       };
@@ -249,6 +282,8 @@ function printResult(result: {
   hasTeamConfig?: boolean;
   approvals: { required: number; received: number; changesRequested: number };
   blockers: { count: number; items: Array<{ line: number; author: string; content: string }> };
+  titles: { required: string[]; missing: string[] };
+  roles: { required: string[]; missing: string[] };
   approvers: Array<{
     author: string;
     title?: string;
@@ -287,6 +322,20 @@ function printResult(result: {
     for (const blocker of result.blockers.items) {
       console.log(chalk.dim(`      L${blocker.line}: ${blocker.content.slice(0, 50)}...`));
     }
+  }
+
+  // Missing titles
+  if (result.titles.missing.length > 0) {
+    console.log(`  ${chalk.red('✗')} Missing title approvals: ${result.titles.missing.join(', ')}`);
+  } else if (result.titles.required.length > 0) {
+    console.log(`  ${chalk.green('✓')} Required titles: ${result.titles.required.join(', ')}`);
+  }
+
+  // Missing roles
+  if (result.roles.missing.length > 0) {
+    console.log(`  ${chalk.red('✗')} Missing role approvals: ${result.roles.missing.join(', ')}`);
+  } else if (result.roles.required.length > 0) {
+    console.log(`  ${chalk.green('✓')} Required roles: ${result.roles.required.join(', ')}`);
   }
 
   // List approvers
