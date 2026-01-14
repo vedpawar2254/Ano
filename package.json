@@ -11,8 +11,12 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
-    "mcp": "node dist/mcp/server.js"
+    "mcp": "node dist/mcp/server.js",
+    "build:all": "npm run build && cd web && npm run build && cd .. && npm run copy:web",
+    "copy:web": "rm -rf dist/web && mkdir -p dist/web && cp -r web/dist/* dist/web/",
+    "prepublishOnly": "npm run build:all"
   },
   "keywords": [
     "claude-code",
