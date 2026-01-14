@@ -35,6 +35,9 @@
   let tooltipEndLine = $state<number | undefined>(undefined);
   let selectedText = $state('');
 
+  // Keyboard shortcuts help
+  let showKeyboardHelp = $state(false);
+
   // Load files list from API
   async function loadFiles() {
     try {
@@ -294,6 +297,102 @@ This is a sample plan file to demonstrate the annotation viewer.
     }
   }
 
+  // Keyboard shortcuts handler
+  function handleKeydown(e: KeyboardEvent) {
+    // Don't handle shortcuts when typing in inputs
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+    // Don't handle when modals are open (except Escape)
+    if ((showAddModal || showTooltip) && e.key !== 'Escape') return;
+
+    const annotations = annotationData?.annotations || [];
+    const sortedAnnotations = [...annotations].sort((a, b) => a.anchor.line - b.anchor.line);
+
+    switch (e.key) {
+      case '?':
+        e.preventDefault();
+        showKeyboardHelp = !showKeyboardHelp;
+        break;
+
+      case 'Escape':
+        e.preventDefault();
+        if (showKeyboardHelp) {
+          showKeyboardHelp = false;
+        } else if (showAddModal) {
+          handleCancelModal();
+        } else if (showTooltip) {
+          clearSelection();
+        } else if (selectedAnnotation) {
+          selectedAnnotation = null;
+          selectedLine = null;
+        }
+        break;
+
+      case 'j':
+      case 'ArrowDown':
+        if (sortedAnnotations.length === 0) break;
+        e.preventDefault();
+        if (!selectedAnnotation) {
+          handleAnnotationClick(sortedAnnotations[0]);
+        } else {
+          const currentIndex = sortedAnnotations.findIndex(a => a.id === selectedAnnotation?.id);
+          const nextIndex = Math.min(currentIndex + 1, sortedAnnotations.length - 1);
+          handleAnnotationClick(sortedAnnotations[nextIndex]);
+        }
+        break;
+
+      case 'k':
+      case 'ArrowUp':
+        if (sortedAnnotations.length === 0) break;
+        e.preventDefault();
+        if (!selectedAnnotation) {
+          handleAnnotationClick(sortedAnnotations[sortedAnnotations.length - 1]);
+        } else {
+          const currentIndex = sortedAnnotations.findIndex(a => a.id === selectedAnnotation?.id);
+          const prevIndex = Math.max(currentIndex - 1, 0);
+          handleAnnotationClick(sortedAnnotations[prevIndex]);
+        }
+        break;
+
+      case 'r':
+        if (selectedAnnotation && selectedAnnotation.status === 'open') {
+          e.preventDefault();
+          handleResolve(selectedAnnotation.id);
+        }
+        break;
+
+      case 'u':
+        if (selectedAnnotation && selectedAnnotation.status === 'resolved') {
+          e.preventDefault();
+          handleReopen(selectedAnnotation.id);
+        }
+        break;
+
+      case 'd':
+        if (selectedAnnotation && e.shiftKey) {
+          e.preventDefault();
+          handleDelete(selectedAnnotation.id);
+        }
+        break;
+
+      case 'a':
+        if (selectedLine) {
+          e.preventDefault();
+          addModalLine = selectedLine;
+          addModalEndLine = undefined;
+          showAddModal = true;
+        }
+        break;
+
+      case '/':
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder="Search annotations..."]') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+        break;
+    }
+  }
+
   // Edit a line in the file
   async function handleLineEdit(line: number, newContent: string) {
     const lines = fileContent.split('\n');
@@ -451,6 +550,8 @@ This is a sample plan file to demonstrate the annotation viewer.
     loadFiles();
   });
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <div class="h-screen flex flex-col bg-surface-950">
   <Header {fileName} {fileContent} {annotationData} {files} onExport={handleExport} onFileSwitch={handleFileSwitch} />
