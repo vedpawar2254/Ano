@@ -1,304 +1,173 @@
-import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
-
-// Simulated annotation data
-const annotations = [
-  {
-    id: 1,
-    line: 4,
-    type: 'concern',
-    author: 'Sarah Chen',
-    avatar: 'SC',
-    content: 'Have we tested the rollback procedure?',
-    timestamp: '2 hours ago'
-  },
-  {
-    id: 2,
-    line: 7,
-    type: 'blocker',
-    author: 'Mike Johnson',
-    avatar: 'MJ',
-    content: 'Need security review before production deployment',
-    timestamp: '1 hour ago'
-  },
-  {
-    id: 3,
-    line: 10,
-    type: 'suggestion',
-    author: 'Alex Rivera',
-    avatar: 'AR',
-    content: 'Consider adding a staging environment step',
-    timestamp: '30 min ago'
-  }
-];
-
-const codeLines = [
-  { num: 1, content: '# Deployment Plan', type: 'heading' },
-  { num: 2, content: '', type: 'empty' },
-  { num: 3, content: '## Phase 1: Database Migration', type: 'subheading' },
-  { num: 4, content: '- Run migration scripts on production', type: 'text', hasAnnotation: 'concern' },
-  { num: 5, content: '- Verify data integrity checks pass', type: 'text' },
-  { num: 6, content: '', type: 'empty' },
-  { num: 7, content: '## Phase 2: Deploy Services', type: 'subheading', hasAnnotation: 'blocker' },
-  { num: 8, content: '- Deploy backend services first', type: 'text' },
-  { num: 9, content: '- Deploy frontend after backend healthy', type: 'text' },
-  { num: 10, content: '- Run smoke tests', type: 'text', hasAnnotation: 'suggestion' },
-  { num: 11, content: '', type: 'empty' },
-  { num: 12, content: '## Phase 3: Verification', type: 'subheading' },
-  { num: 13, content: '- Monitor error rates for 30 minutes', type: 'text' },
-  { num: 14, content: '- Get sign-off from on-call engineer', type: 'text' },
-];
-
-const typeColors: Record<string, { bg: string; border: string; text: string; marker: string }> = {
-  concern: {
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/30',
-    text: 'text-amber-400',
-    marker: 'bg-amber-500'
-  },
-  blocker: {
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/30',
-    text: 'text-red-400',
-    marker: 'bg-red-500'
-  },
-  suggestion: {
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/30',
-    text: 'text-green-400',
-    marker: 'bg-green-500'
-  },
-  question: {
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/30',
-    text: 'text-blue-400',
-    marker: 'bg-blue-500'
-  }
-};
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useRef } from 'react';
 
 export function Demo() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const [selectedAnnotation, setSelectedAnnotation] = useState<number | null>(null);
-  const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, { once: true, margin: '-100px' });
 
-  // Auto-cycle through annotations
-  useEffect(() => {
-    if (!isInView) return;
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
 
-    const interval = setInterval(() => {
-      setSelectedAnnotation(prev => {
-        const next = prev === null ? 0 : (prev + 1) % annotations.length;
-        setHighlightedLine(annotations[next].line);
-        return next;
-      });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [isInView]);
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.8, 1, 1, 0.8]);
 
   return (
-    <section id="demo" className="relative py-32 overflow-hidden" ref={ref}>
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-800/50 to-slate-900" />
+    <section id="demo" ref={containerRef} className="relative py-32 px-6 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-black" />
 
-      <div className="relative max-w-6xl mx-auto px-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <motion.span
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium rounded-full mb-6"
-          >
-            Interactive Demo
-          </motion.span>
-
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            See it in{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              action
-            </span>
-          </h2>
-
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            Click on annotations to see how your team can collaborate on AI-generated plans.
-          </p>
-        </motion.div>
-
-        {/* Demo UI */}
+      <div className="relative max-w-6xl mx-auto">
+        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="max-w-5xl mx-auto"
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
         >
-          <motion.div
-            className="bg-slate-900/90 backdrop-blur border border-slate-700 rounded-2xl overflow-hidden shadow-2xl"
-            whileHover={{ borderColor: 'rgb(71, 85, 105)' }}
-          >
-            {/* Window header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-800/50 border-b border-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-2">
-                  <motion.div className="w-3 h-3 rounded-full bg-red-500" whileHover={{ scale: 1.3 }} />
-                  <motion.div className="w-3 h-3 rounded-full bg-yellow-500" whileHover={{ scale: 1.3 }} />
-                  <motion.div className="w-3 h-3 rounded-full bg-green-500" whileHover={{ scale: 1.3 }} />
-                </div>
-                <span className="text-slate-400 text-sm font-mono">deploy-plan.md</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+            See it in action
+          </h2>
+          <p className="text-neutral-500 text-lg max-w-xl mx-auto">
+            Add annotations, discuss with your team, approve when ready.
+          </p>
+        </motion.div>
+
+        {/* Product screenshot mockup */}
+        <motion.div
+          style={{ y, opacity, scale }}
+          className="relative"
+        >
+          {/* Glow effect */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-violet-500/20 via-fuchsia-500/20 to-orange-500/20 rounded-2xl blur-3xl" />
+
+          {/* Screenshot container */}
+          <div className="relative bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden shadow-2xl">
+            {/* Window chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-800 bg-neutral-900/50">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
               </div>
-              <div className="flex items-center gap-3">
-                <span className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 rounded">
-                  1 concern
-                </span>
-                <span className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded">
-                  1 blocker
-                </span>
-                <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded">
-                  1 suggestion
-                </span>
+              <div className="flex-1 flex justify-center">
+                <span className="text-xs text-neutral-600 font-mono">localhost:3000/plan.md</span>
               </div>
             </div>
 
             {/* Content area */}
-            <div className="flex">
-              {/* Code viewer */}
-              <div className="flex-1 p-4 font-mono text-sm overflow-x-auto">
-                {codeLines.map((line) => (
-                  <motion.div
-                    key={line.num}
-                    className={`flex items-center py-0.5 px-2 rounded transition-colors relative ${
-                      highlightedLine === line.num ? 'bg-blue-500/10' : ''
-                    }`}
-                    animate={{
-                      backgroundColor: highlightedLine === line.num ? 'rgba(59, 130, 246, 0.1)' : 'transparent'
-                    }}
-                  >
-                    {/* Annotation marker */}
-                    {line.hasAnnotation && (
-                      <motion.div
-                        className={`absolute -left-1 w-1 h-5 rounded-full ${typeColors[line.hasAnnotation].marker}`}
-                        layoutId={`marker-${line.num}`}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        whileHover={{ width: 4, left: -2 }}
-                      />
-                    )}
-
-                    <span className="text-slate-500 w-8 select-none">{line.num}</span>
-                    <span className={`
-                      ${line.type === 'heading' ? 'text-blue-400 font-bold' : ''}
-                      ${line.type === 'subheading' ? 'text-purple-400 font-semibold' : ''}
-                      ${line.type === 'text' ? 'text-slate-300' : ''}
-                      ${line.hasAnnotation ? typeColors[line.hasAnnotation].bg + ' px-1 rounded' : ''}
-                    `}>
-                      {line.content}
-                    </span>
-                  </motion.div>
-                ))}
+            <div className="flex min-h-[400px]">
+              {/* Editor panel */}
+              <div className="flex-1 p-6 font-mono text-sm border-r border-neutral-800">
+                <div className="space-y-2">
+                  <Line num={1} content="# Deployment Plan" type="heading" />
+                  <Line num={2} content="" />
+                  <Line num={3} content="## Phase 1: Preparation" type="subheading" />
+                  <Line num={4} content="- Backup production database" annotation="concern" />
+                  <Line num={5} content="- Notify on-call team" />
+                  <Line num={6} content="" />
+                  <Line num={7} content="## Phase 2: Deploy" type="subheading" />
+                  <Line num={8} content="- Deploy to staging first" annotation="blocker" />
+                  <Line num={9} content="- Run smoke tests" />
+                  <Line num={10} content="- Deploy to production" />
+                </div>
               </div>
 
-              {/* Sidebar */}
-              <div className="w-80 border-l border-slate-700 bg-slate-800/30">
-                <div className="p-4 border-b border-slate-700">
-                  <h3 className="text-white font-semibold text-sm">Annotations</h3>
-                  <p className="text-slate-500 text-xs mt-1">3 comments on this file</p>
+              {/* Annotations panel */}
+              <div className="w-72 p-4 bg-neutral-950/50">
+                <div className="text-xs text-neutral-500 uppercase tracking-wider mb-4">
+                  Annotations
                 </div>
-
-                <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
-                  <AnimatePresence mode="popLayout">
-                    {annotations.map((annotation, index) => (
-                      <motion.div
-                        key={annotation.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ delay: index * 0.1 }}
-                        onClick={() => {
-                          setSelectedAnnotation(index);
-                          setHighlightedLine(annotation.line);
-                        }}
-                        className={`p-3 rounded-lg cursor-pointer transition-all ${
-                          typeColors[annotation.type].bg
-                        } border ${
-                          selectedAnnotation === index
-                            ? typeColors[annotation.type].border + ' shadow-lg'
-                            : 'border-transparent'
-                        }`}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <motion.span
-                            className={`px-1.5 py-0.5 text-xs rounded ${typeColors[annotation.type].bg} ${typeColors[annotation.type].text} border ${typeColors[annotation.type].border}`}
-                            whileHover={{ scale: 1.1 }}
-                          >
-                            {annotation.type}
-                          </motion.span>
-                          <span className="text-xs text-slate-500">Line {annotation.line}</span>
-                        </div>
-                        <p className="text-sm text-slate-300 mb-2">{annotation.content}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[10px] text-white font-medium">
-                            {annotation.avatar}
-                          </div>
-                          <span className="text-xs text-slate-400">{annotation.author}</span>
-                          <span className="text-xs text-slate-500 ml-auto">{annotation.timestamp}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-
-                {/* Action buttons */}
-                <div className="p-4 border-t border-slate-700">
-                  <div className="flex gap-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      Approve
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      Add Comment
-                    </motion.button>
-                  </div>
+                <div className="space-y-3">
+                  <Annotation
+                    type="concern"
+                    line={4}
+                    author="SC"
+                    text="How long will backup take?"
+                  />
+                  <Annotation
+                    type="blocker"
+                    line={8}
+                    author="MJ"
+                    text="Need QA approval first"
+                  />
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-
-        {/* CTA below demo */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-12"
-        >
-          <motion.a
-            href="#quickstart"
-            whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(139, 92, 246, 0.4)' }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg shadow-lg shadow-purple-600/25"
-          >
-            Try it yourself
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.a>
+          </div>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function Line({
+  num,
+  content,
+  type,
+  annotation,
+}: {
+  num: number;
+  content: string;
+  type?: 'heading' | 'subheading';
+  annotation?: 'concern' | 'blocker';
+}) {
+  const textColor = type === 'heading'
+    ? 'text-white font-bold'
+    : type === 'subheading'
+    ? 'text-neutral-300 font-semibold'
+    : 'text-neutral-400';
+
+  const annotationStyle = annotation === 'concern'
+    ? 'bg-amber-500/10 border-l-2 border-amber-500'
+    : annotation === 'blocker'
+    ? 'bg-red-500/10 border-l-2 border-red-500'
+    : '';
+
+  return (
+    <div className={`flex items-center gap-4 px-2 py-0.5 rounded ${annotationStyle}`}>
+      <span className="text-neutral-600 w-6 text-right select-none">{num}</span>
+      <span className={textColor}>{content}</span>
+    </div>
+  );
+}
+
+function Annotation({
+  type,
+  line,
+  author,
+  text,
+}: {
+  type: 'concern' | 'blocker';
+  line: number;
+  author: string;
+  text: string;
+}) {
+  const colors = type === 'concern'
+    ? 'border-amber-500/30 bg-amber-500/5'
+    : 'border-red-500/30 bg-red-500/5';
+
+  const badge = type === 'concern'
+    ? 'bg-amber-500/20 text-amber-400'
+    : 'bg-red-500/20 text-red-400';
+
+  return (
+    <div className={`p-3 rounded-lg border ${colors}`}>
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`text-xs px-1.5 py-0.5 rounded ${badge}`}>
+          {type}
+        </span>
+        <span className="text-xs text-neutral-600">Line {line}</span>
+      </div>
+      <p className="text-sm text-neutral-300 mb-2">{text}</p>
+      <div className="flex items-center gap-2">
+        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-[10px] text-white font-medium">
+          {author}
+        </div>
+        <span className="text-xs text-neutral-500">2h ago</span>
+      </div>
+    </div>
   );
 }

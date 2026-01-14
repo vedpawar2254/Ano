@@ -6,8 +6,8 @@
 - [x] sidebar in web needs to improve 
 - [x] better UI in the local web 
 - publish
-- CI/CD
-- issue tracker, docs, etc.
+- [x] CI/CD
+- [x] issue tracker, docs, etc.
 - [x] remove UI friction
 - [ ] remove comments in code
 - [x] Shareable URLs with annotation state
