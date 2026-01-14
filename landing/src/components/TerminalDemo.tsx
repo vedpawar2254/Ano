@@ -95,8 +95,8 @@ export function TerminalDemo() {
           </p>
         </div>
 
-        <div className="grid grid-cols-[140px,1fr,1fr] gap-3 items-stretch">
-          <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-3 overflow-hidden">
+        <div className="flex gap-3" style={{ display: 'flex', flexDirection: 'row' }}>
+          <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-3 overflow-hidden" style={{ width: '160px', flexShrink: 0 }}>
             <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-3">
               Commands
             </p>
@@ -122,9 +122,9 @@ export function TerminalDemo() {
 
           <div
             className="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden flex flex-col"
+            style={{ flex: 1 }}
             onClick={focusInput}
           >
-            {/* Chrome */}
             <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
@@ -134,9 +134,7 @@ export function TerminalDemo() {
               <span className="text-[10px] text-zinc-600 font-mono ml-2">terminal</span>
             </div>
 
-            {/* Terminal content */}
             <div className="flex-1 p-4 font-mono text-sm min-h-[300px]">
-              {/* Previous commands */}
               {history.slice(-5).map((cmd, i) => (
                 <div key={i} className="flex items-center gap-2 text-zinc-600 mb-1">
                   <span className="text-zinc-700">$</span>
@@ -144,7 +142,6 @@ export function TerminalDemo() {
                 </div>
               ))}
 
-              {/* Current input */}
               <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <span className="text-emerald-500">$</span>
                 <input
@@ -160,16 +157,13 @@ export function TerminalDemo() {
                 />
               </form>
 
-              {/* Hint */}
               <div className="mt-6 text-[10px] text-zinc-700">
                 Tab to autocomplete · Arrow keys for history
               </div>
             </div>
           </div>
 
-          {/* Output panel */}
-          <div className="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden flex flex-col">
-            {/* Chrome */}
+          <div className="bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden flex flex-col" style={{ flex: 1 }}>
             <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
@@ -184,7 +178,6 @@ export function TerminalDemo() {
               )}
             </div>
 
-            {/* Output content */}
             <div className="flex-1 p-4 min-h-[300px] overflow-auto">
               <AnimatePresence mode="wait">
                 <motion.div
