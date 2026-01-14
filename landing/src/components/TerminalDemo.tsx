@@ -105,10 +105,11 @@ export function TerminalDemo() {
     }
   };
 
-  const focusInput = () => inputRef.current?.focus();
+  const focusInput = () => inputRef.current?.focus({ preventScroll: true });
 
   useEffect(() => {
-    focusInput();
+    // Don't auto-focus on mount to prevent scroll
+    // focusInput();
   }, []);
 
   const output = currentCommand && commandOutputs[currentCommand]
