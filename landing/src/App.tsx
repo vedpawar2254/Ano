@@ -1,4 +1,4 @@
-import { Hero, Problem, Features, TerminalDemo, QuickCommands, MCPSection, Demo, Footer } from './components';
+import { Banner, Hero, Problem, Features, TerminalDemo, QuickCommands, MCPSection, Demo, Footer } from './components';
 import { motion } from 'framer-motion';
 
 function EasySection() {
@@ -25,6 +25,7 @@ function EasySection() {
 function App() {
   return (
     <div className="min-h-screen bg-black text-white antialiased">
+      <Banner />
       <Hero />
       <Problem />
       <Features />

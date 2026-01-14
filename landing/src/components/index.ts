@@ -1,3 +1,4 @@
+export { Banner } from './Banner';
 export { FlowingRibbon } from './FlowingRibbon';
 export { Hero } from './Hero';
 export { Problem } from './Problem';

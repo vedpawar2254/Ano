@@ -41,7 +41,7 @@ export function Problem() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <p className="text-zinc-500 text-sm font-medium mb-3">The shift</p>
+          <p className="text-zinc-500 text-md font-medium mb-3 hover:text-emerald-500 transition-colors cursor-pointer">The shift</p>
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
             Development is changing
           </h2>
