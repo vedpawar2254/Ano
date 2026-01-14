@@ -25,8 +25,9 @@ import {
   questionCommand,
 } from './commands/quick.js';
 import { teamCommand } from './commands/team.js';
-import { replyCommand, deleteCommand, syncCommand } from './commands/manage.js';
+import { replyCommand, deleteCommand, syncCommand, exportCommand, importCommand } from './commands/manage.js';
 import { serveCommand } from './commands/serve.js';
+import { diffCommand } from './commands/diff.js';
 
 // Create the main program
 const program = new Command();
@@ -57,6 +58,13 @@ program.addCommand(teamCommand);
 program.addCommand(replyCommand);
 program.addCommand(deleteCommand);
 program.addCommand(syncCommand);
+
+// Import/Export
+program.addCommand(exportCommand);
+program.addCommand(importCommand);
+
+// Version tracking
+program.addCommand(diffCommand);
 
 // Web viewer
 program.addCommand(serveCommand);
