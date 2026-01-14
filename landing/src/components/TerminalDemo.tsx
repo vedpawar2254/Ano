@@ -28,6 +28,7 @@ const commands = [
   'ano init',
   'ano config',
   'ano users',
+  'clear',
 ];
 
 export function TerminalDemo() {
@@ -39,6 +40,12 @@ export function TerminalDemo() {
 
   const executeCommand = (cmd: string) => {
     if (!cmd.trim()) return;
+    if (cmd === 'clear') {
+      setHistory([]);
+      setCurrentCommand(null);
+      setInput('');
+      return;
+    }
     setCurrentCommand(cmd);
     setHistory(prev => [...prev, cmd]);
     setInput('');
@@ -210,11 +217,11 @@ function ServeOutput({ port = 3000 }: { port?: number }) {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-zinc-300">Sarah</span>
+            <span className="text-zinc-300">Piyush</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-zinc-300">Mike</span>
+            <span className="text-zinc-300">Aarya</span>
           </div>
         </div>
       </div>
