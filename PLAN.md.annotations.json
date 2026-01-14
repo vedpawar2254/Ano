@@ -240,7 +240,23 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-14T06:39:11.992Z",
       "content": "asdcsd",
-      "status": "open",
+      "status": "resolved",
+      "replies": []
+    },
+    {
+      "id": "20eebfce-248e-4758-82fa-e9661922bdad",
+      "anchor": {
+        "line": 29,
+        "endLine": 36,
+        "contextBefore": "- Claude can respond to and address feedback\n- Claude can mark items as addressedasd",
+        "contextAfter": "- Require N approvals before proceeding\n- Track who approved/rejected",
+        "contentHash": "2f05a9ff4e81"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-14T07:04:20.841Z",
+      "content": "asdfasdf",
+      "status": "resolved",
       "replies": []
     }
   ],

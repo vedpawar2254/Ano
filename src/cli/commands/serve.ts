@@ -4,7 +4,7 @@
  * Start a local web server for viewing annotations.
  *
  * Usage:
- *   ano serve <file>           Start server for a specific file
+ *   ano serve <file...>           Start server for one or more files
  *   ano serve <file> --port 8080  Use custom port
  */
 
@@ -46,18 +46,24 @@ async function parseJsonBody(req: IncomingMessage): Promise<any> {
 
 export const serveCommand = new Command('serve')
   .description('Start web viewer for annotations')
-  .argument('<file>', 'File to view')
+  .argument('<files...>', 'Files to view')
   .option('-p, --port <port>', 'Port to use', '3000')
   .option('--no-open', 'Don\'t open browser automatically')
-  .action(async (file: string, options: { port: string; open: boolean }) => {
-    const filePath = resolve(file);
+  .action(async (files: string[], options: { port: string; open: boolean }) => {
+    // Resolve all file paths
+    const filePaths = files.map(f => resolve(f));
     const port = parseInt(options.port, 10);
 
-    // Check file exists
-    if (!existsSync(filePath)) {
-      console.error(chalk.red(`File not found: ${filePath}`));
-      process.exit(1);
+    // Check all files exist
+    for (const fp of filePaths) {
+      if (!existsSync(fp)) {
+        console.error(chalk.red(`File not found: ${fp}`));
+        process.exit(1);
+      }
     }
+
+    // Track currently selected file (default to first)
+    let currentFilePath = filePaths[0];
 
     // Find web dist directory
     const webDistPath = resolve(dirname(new URL(import.meta.url).pathname), '../../../web/dist');
@@ -71,22 +77,68 @@ export const serveCommand = new Command('serve')
 
     // Create HTTP server
     const server = createServer(async (req, res) => {
-      const url = req.url || '/';
+      const reqUrl = new URL(req.url || '/', `http://localhost:${port}`);
+      const url = reqUrl.pathname;
+
+      // API endpoint to list all available files
+      if (url === '/api/files' && req.method === 'GET') {
+        try {
+          const fileList = await Promise.all(filePaths.map(async (fp) => {
+            const annotations = await readAnnotationFile(fp);
+            const openCount = annotations?.annotations.filter(a => a.status === 'open').length || 0;
+            return {
+              path: fp,
+              name: basename(fp),
+              openAnnotations: openCount,
+              isCurrent: fp === currentFilePath,
+            };
+          }));
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ files: fileList }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to switch current file
+      if (url === '/api/switch' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { filePath: newPath } = body as { filePath: string };
+
+          if (!filePaths.includes(newPath)) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'File not in served files list' }));
+            return;
+          }
+
+          currentFilePath = newPath;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, currentFile: basename(currentFilePath) }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
 
       // API endpoint for current file data
       if (url === '/api/current' && req.method === 'GET') {
         try {
-          const content = await readFile(filePath, 'utf-8');
-          const annotations = await readAnnotationFile(filePath);
+          const content = await readFile(currentFilePath, 'utf-8');
+          const annotations = await readAnnotationFile(currentFilePath);
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
-            fileName: basename(filePath),
-            filePath,
+            fileName: basename(currentFilePath),
+            filePath: currentFilePath,
             content,
             annotations: annotations || {
               version: '1.0',
-              file: filePath,
+              file: currentFilePath,
               fileHash: '',
               annotations: [],
               approvals: [],
@@ -113,7 +165,7 @@ export const serveCommand = new Command('serve')
 
           const author = await getAuthorString();
           await addAnnotation({
-            file: filePath,
+            file: currentFilePath,
             line,
             endLine,
             type,
@@ -142,7 +194,7 @@ export const serveCommand = new Command('serve')
             return;
           }
 
-          const resolved = await resolveAnnotation(filePath, annotationId);
+          const resolved = await resolveAnnotation(currentFilePath, annotationId);
           if (!resolved) {
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Annotation not found' }));
@@ -171,7 +223,32 @@ export const serveCommand = new Command('serve')
           }
 
           const author = await getAuthorString();
-          await setApproval(filePath, author, status, undefined, comment);
+          await setApproval(currentFilePath, author, status, undefined, comment);
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to save file content
+      if (url === '/api/save' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { content } = body as { content: string };
+
+          if (content === undefined) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required field: content' }));
+            return;
+          }
+
+          // Write the updated content to the file
+          const { writeFile } = await import('node:fs/promises');
+          await writeFile(currentFilePath, content, 'utf-8');
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: true }));
@@ -251,11 +328,11 @@ export const serveCommand = new Command('serve')
 
       // Fallback: serve inline HTML if web dist not available
       if (url === '/' || url === '/index.html') {
-        const content = await readFile(filePath, 'utf-8');
-        const annotations = await readAnnotationFile(filePath);
+        const content = await readFile(currentFilePath, 'utf-8');
+        const annotations = await readAnnotationFile(currentFilePath);
 
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(generateFallbackHtml(basename(filePath), content, annotations));
+        res.end(generateFallbackHtml(basename(currentFilePath), content, annotations));
         return;
       }
 
@@ -268,7 +345,7 @@ export const serveCommand = new Command('serve')
       console.log();
       console.log(chalk.green.bold('  Ano Web Viewer'));
       console.log();
-      console.log(`  ${chalk.bold('File:')}   ${basename(filePath)}`);
+      console.log(`  ${chalk.bold('Files:')}  ${filePaths.map(fp => basename(fp)).join(', ')}`);
       console.log(`  ${chalk.bold('URL:')}    ${chalk.cyan(`http://localhost:${port}`)}`);
       console.log();
       console.log(chalk.dim('  Press Ctrl+C to stop'));

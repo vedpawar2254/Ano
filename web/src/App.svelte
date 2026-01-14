@@ -6,6 +6,13 @@
   import SelectionTooltip from './lib/SelectionTooltip.svelte';
   import type { AnnotationFile, Annotation, AnnotationType } from './lib/types';
 
+  interface FileInfo {
+    path: string;
+    name: string;
+    openAnnotations: number;
+    isCurrent: boolean;
+  }
+
   // State
   let fileContent = $state('');
   let fileName = $state('');
@@ -13,6 +20,7 @@
   let selectedAnnotation = $state<Annotation | null>(null);
   let selectedLine = $state<number | null>(null);
   let fileViewerContainer: HTMLDivElement;
+  let files = $state<FileInfo[]>([]);
 
   // Modal state
   let showAddModal = $state(false);
@@ -26,6 +34,37 @@
   let tooltipLine = $state(0);
   let tooltipEndLine = $state<number | undefined>(undefined);
   let selectedText = $state('');
+
+  // Load files list from API
+  async function loadFiles() {
+    try {
+      const response = await fetch('/api/files');
+      const data = await response.json();
+      files = data.files || [];
+    } catch (e) {
+      files = [];
+    }
+  }
+
+  // Switch to a different file
+  async function handleFileSwitch(filePath: string) {
+    try {
+      const response = await fetch('/api/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath })
+      });
+      if (response.ok) {
+        await loadData();
+        await loadFiles();
+        // Clear selection state when switching files
+        selectedAnnotation = null;
+        selectedLine = null;
+      }
+    } catch (e) {
+      console.error('Failed to switch file:', e);
+    }
+  }
 
   // Load data from API
   async function loadData() {
@@ -208,6 +247,27 @@ This is a sample plan file to demonstrate the annotation viewer.
     }
   }
 
+  // Edit a line in the file
+  async function handleLineEdit(line: number, newContent: string) {
+    const lines = fileContent.split('\n');
+    lines[line - 1] = newContent;
+    const updatedContent = lines.join('\n');
+
+    try {
+      const response = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: updatedContent })
+      });
+      if (response.ok) {
+        // Update local state immediately for responsiveness
+        fileContent = updatedContent;
+      }
+    } catch (e) {
+      console.error('Failed to save:', e);
+    }
+  }
+
   // Export as standalone HTML
   function handleExport() {
     if (!fileContent || !annotationData) return;
@@ -341,11 +401,12 @@ This is a sample plan file to demonstrate the annotation viewer.
 
   $effect(() => {
     loadData();
+    loadFiles();
   });
 </script>
 
 <div class="h-screen flex flex-col">
-  <Header {fileName} {fileContent} {annotationData} onExport={handleExport} />
+  <Header {fileName} {fileContent} {annotationData} {files} onExport={handleExport} onFileSwitch={handleFileSwitch} />
 
   <div class="flex-1 flex overflow-hidden">
     <div class="flex-1 overflow-auto" bind:this={fileViewerContainer}>
@@ -358,6 +419,7 @@ This is a sample plan file to demonstrate the annotation viewer.
         onAnnotationClick={handleAnnotationClick}
         onSelection={handleSelection}
         onSelectionClear={clearSelection}
+        onLineEdit={handleLineEdit}
       />
     </div>
 

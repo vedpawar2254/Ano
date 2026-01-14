@@ -4,7 +4,7 @@
 
 Ano enables teams to annotate, review, and approve Claude-generated plans and markdown files before execution. It integrates with Claude Code via MCP and hooks, creating a human-in-the-loop workflow for AI-assisted development.
 
-## Features
+## Features 
 
 - **Inline Annotations** - Add comments to specific lines with types: `concern`, `question`, `suggestion`, `blocker`
 - **Approval Gates** - Require N approvals before Claude can proceed (via hooks)

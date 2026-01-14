@@ -25,7 +25,7 @@ Structured comment types for clarity:
 ### 4. Claude Integration
 - Claude can read annotations when asked
 - Claude can respond to and address feedback
-- Claude can mark items as addressed
+- Claude can mark items as addressedasd
 
 ### 5. CLI Summary View
 - `/annotations` command to view all open items

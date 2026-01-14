@@ -1,14 +1,23 @@
 <script lang="ts">
   import type { AnnotationFile } from './types';
 
+  interface FileInfo {
+    path: string;
+    name: string;
+    openAnnotations: number;
+    isCurrent: boolean;
+  }
+
   interface Props {
     fileName: string;
     fileContent: string;
     annotationData: AnnotationFile | null;
+    files?: FileInfo[];
     onExport?: () => void;
+    onFileSwitch?: (filePath: string) => void;
   }
 
-  let { fileName, fileContent, annotationData, onExport }: Props = $props();
+  let { fileName, fileContent, annotationData, files = [], onExport, onFileSwitch }: Props = $props();
 
   let copied = $state(false);
   let shareLink = $state('');
@@ -134,13 +143,33 @@
 
 <header class="bg-slate-800 border-b border-slate-700 px-4 py-3">
   <div class="flex items-center justify-between">
-    <!-- Logo and file name -->
+    <!-- Logo and file tabs -->
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
         <span class="text-xl font-bold text-blue-400">ano</span>
       </div>
       <div class="h-6 w-px bg-slate-600"></div>
-      <span class="text-slate-300 font-mono text-sm">{fileName || 'No file loaded'}</span>
+
+      {#if files.length > 1}
+        <!-- File tabs -->
+        <div class="flex items-center gap-1">
+          {#each files as file}
+            <button
+              class="px-3 py-1 text-sm font-mono rounded-t transition-colors flex items-center gap-2 {file.isCurrent ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}"
+              onclick={() => onFileSwitch?.(file.path)}
+            >
+              {file.name}
+              {#if file.openAnnotations > 0}
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400">
+                  {file.openAnnotations}
+                </span>
+              {/if}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <span class="text-slate-300 font-mono text-sm">{fileName || 'No file loaded'}</span>
+      {/if}
     </div>
 
     <!-- Stats -->
