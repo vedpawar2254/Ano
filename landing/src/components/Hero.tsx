@@ -148,6 +148,15 @@ export function Hero() {
             </a>
           </motion.div>
 
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-3 text-xs text-zinc-600"
+          >
+            npm package coming soon - <a href="https://github.com/vedpawar2254/Ano" className="text-zinc-500 hover:text-emerald-500 transition-colors">install from source</a>
+          </motion.p>
+
           {/* Social proof */}
           <motion.div
             initial={{ opacity: 0 }}
