@@ -9,7 +9,6 @@
 - [x] CI/CD
 - [x] issue tracker, docs, etc.
 - [x] remove UI friction
-- [ ] remove comments in code
 - [x] Shareable URLs with annotation state
 - [ ] realtime team colaboration
 - [ ] Also a "Send feedback" button to directly send feedback to claudecode
