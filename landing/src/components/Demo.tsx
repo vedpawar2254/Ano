@@ -10,89 +10,95 @@ export function Demo() {
     offset: ['start end', 'end start'],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.8, 1, 1, 0.8]);
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.3, 1, 1, 0.3]);
 
   return (
-    <section id="demo" ref={containerRef} className="relative py-32 px-6 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-950 to-black" />
-
-      <div className="relative max-w-6xl mx-auto">
-        {/* Section header */}
+    <section id="demo" ref={containerRef} className="relative py-32 px-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            See it in action
+          <p className="text-emerald-500 text-sm font-medium mb-3">How it works</p>
+          <h2 className="text-3xl md:text-4xl font-semibold text-white">
+            Review before execution
           </h2>
-          <p className="text-neutral-500 text-lg max-w-xl mx-auto">
-            Add annotations, discuss with your team, approve when ready.
-          </p>
         </motion.div>
 
-        {/* Product screenshot mockup */}
-        <motion.div
-          style={{ y, opacity, scale }}
-          className="relative"
-        >
-          {/* Glow effect */}
-          <div className="absolute -inset-4 bg-gradient-to-r from-violet-500/20 via-fuchsia-500/20 to-orange-500/20 rounded-2xl blur-3xl" />
-
-          {/* Screenshot container */}
-          <div className="relative bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden shadow-2xl">
-            {/* Window chrome */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-800 bg-neutral-900/50">
+        {/* Screenshot */}
+        <motion.div style={{ y, opacity }} className="relative">
+          {/* Window */}
+          <div className="relative bg-zinc-950 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl shadow-black/50">
+            {/* Chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 bg-zinc-900/50">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-neutral-700" />
-                <div className="w-3 h-3 rounded-full bg-neutral-700" />
-                <div className="w-3 h-3 rounded-full bg-neutral-700" />
+                <div className="w-3 h-3 rounded-full bg-zinc-700" />
+                <div className="w-3 h-3 rounded-full bg-zinc-700" />
+                <div className="w-3 h-3 rounded-full bg-zinc-700" />
               </div>
               <div className="flex-1 flex justify-center">
-                <span className="text-xs text-neutral-600 font-mono">localhost:3000/plan.md</span>
+                <span className="text-xs text-zinc-600 font-mono">ano review deploy-plan.md</span>
               </div>
             </div>
 
-            {/* Content area */}
-            <div className="flex min-h-[400px]">
-              {/* Editor panel */}
-              <div className="flex-1 p-6 font-mono text-sm border-r border-neutral-800">
-                <div className="space-y-2">
-                  <Line num={1} content="# Deployment Plan" type="heading" />
+            {/* Content */}
+            <div className="flex">
+              {/* Editor */}
+              <div className="flex-1 p-5 font-mono text-sm border-r border-zinc-800">
+                <div className="space-y-1">
+                  <Line num={1} content="# Deployment Plan" bold />
                   <Line num={2} content="" />
-                  <Line num={3} content="## Phase 1: Preparation" type="subheading" />
+                  <Line num={3} content="## 1. Pre-deploy" muted />
                   <Line num={4} content="- Backup production database" annotation="concern" />
                   <Line num={5} content="- Notify on-call team" />
                   <Line num={6} content="" />
-                  <Line num={7} content="## Phase 2: Deploy" type="subheading" />
-                  <Line num={8} content="- Deploy to staging first" annotation="blocker" />
+                  <Line num={7} content="## 2. Deploy" muted />
+                  <Line num={8} content="- Push to staging first" annotation="blocker" />
                   <Line num={9} content="- Run smoke tests" />
                   <Line num={10} content="- Deploy to production" />
+                  <Line num={11} content="" />
+                  <Line num={12} content="## 3. Verify" muted />
+                  <Line num={13} content="- Monitor error rates" />
+                  <Line num={14} content="- Check latency metrics" />
                 </div>
               </div>
 
-              {/* Annotations panel */}
-              <div className="w-72 p-4 bg-neutral-950/50">
-                <div className="text-xs text-neutral-500 uppercase tracking-wider mb-4">
+              {/* Sidebar */}
+              <div className="w-64 p-4 bg-zinc-900/30">
+                <p className="text-[11px] text-zinc-600 uppercase tracking-wider mb-4">
                   Annotations
-                </div>
+                </p>
                 <div className="space-y-3">
-                  <Annotation
+                  <AnnotationCard
                     type="concern"
                     line={4}
-                    author="SC"
-                    text="How long will backup take?"
+                    author="Sarah"
+                    text="How long will this take? We have a 5min window."
                   />
-                  <Annotation
+                  <AnnotationCard
                     type="blocker"
                     line={8}
-                    author="MJ"
-                    text="Need QA approval first"
+                    author="Mike"
+                    text="Need QA sign-off before staging."
                   />
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-zinc-800">
+                  <p className="text-[11px] text-zinc-600 uppercase tracking-wider mb-3">
+                    Approvals
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-xs text-zinc-500">2 of 3 approved</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -106,35 +112,37 @@ export function Demo() {
 function Line({
   num,
   content,
-  type,
+  bold,
+  muted,
   annotation,
 }: {
   num: number;
   content: string;
-  type?: 'heading' | 'subheading';
+  bold?: boolean;
+  muted?: boolean;
   annotation?: 'concern' | 'blocker';
 }) {
-  const textColor = type === 'heading'
-    ? 'text-white font-bold'
-    : type === 'subheading'
-    ? 'text-neutral-300 font-semibold'
-    : 'text-neutral-400';
-
-  const annotationStyle = annotation === 'concern'
-    ? 'bg-amber-500/10 border-l-2 border-amber-500'
+  const bgClass = annotation === 'concern'
+    ? 'bg-amber-500/5 border-l-2 border-amber-500/50'
     : annotation === 'blocker'
-    ? 'bg-red-500/10 border-l-2 border-red-500'
+    ? 'bg-red-500/5 border-l-2 border-red-500/50'
     : '';
 
+  const textClass = bold
+    ? 'text-white font-medium'
+    : muted
+    ? 'text-zinc-500'
+    : 'text-zinc-400';
+
   return (
-    <div className={`flex items-center gap-4 px-2 py-0.5 rounded ${annotationStyle}`}>
-      <span className="text-neutral-600 w-6 text-right select-none">{num}</span>
-      <span className={textColor}>{content}</span>
+    <div className={`flex items-center gap-4 px-2 py-0.5 -mx-2 rounded ${bgClass}`}>
+      <span className="text-zinc-700 w-5 text-right text-xs select-none">{num}</span>
+      <span className={textClass}>{content}</span>
     </div>
   );
 }
 
-function Annotation({
+function AnnotationCard({
   type,
   line,
   author,
@@ -145,29 +153,21 @@ function Annotation({
   author: string;
   text: string;
 }) {
-  const colors = type === 'concern'
-    ? 'border-amber-500/30 bg-amber-500/5'
-    : 'border-red-500/30 bg-red-500/5';
-
-  const badge = type === 'concern'
-    ? 'bg-amber-500/20 text-amber-400'
-    : 'bg-red-500/20 text-red-400';
+  const borderClass = type === 'concern' ? 'border-amber-500/20' : 'border-red-500/20';
+  const badgeClass = type === 'concern'
+    ? 'bg-amber-500/10 text-amber-500'
+    : 'bg-red-500/10 text-red-500';
 
   return (
-    <div className={`p-3 rounded-lg border ${colors}`}>
+    <div className={`p-3 rounded-lg border ${borderClass} bg-zinc-900/50`}>
       <div className="flex items-center gap-2 mb-2">
-        <span className={`text-xs px-1.5 py-0.5 rounded ${badge}`}>
+        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${badgeClass}`}>
           {type}
         </span>
-        <span className="text-xs text-neutral-600">Line {line}</span>
+        <span className="text-[10px] text-zinc-600">L{line}</span>
       </div>
-      <p className="text-sm text-neutral-300 mb-2">{text}</p>
-      <div className="flex items-center gap-2">
-        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-[10px] text-white font-medium">
-          {author}
-        </div>
-        <span className="text-xs text-neutral-500">2h ago</span>
-      </div>
+      <p className="text-xs text-zinc-400 mb-2">{text}</p>
+      <p className="text-[10px] text-zinc-600">{author}</p>
     </div>
   );
 }

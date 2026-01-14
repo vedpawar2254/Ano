@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
 
 /* Base styles */
 * {
@@ -40,7 +40,7 @@ code, .font-mono {
   background: #404040;
 }
 
-/* Selection - using warm accent */
+/* Selection */
 ::selection {
   background: rgba(16, 185, 129, 0.3);
 }
