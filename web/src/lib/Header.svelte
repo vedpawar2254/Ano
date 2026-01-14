@@ -11,6 +11,8 @@
   let { fileName, fileContent, annotationData, onExport }: Props = $props();
 
   let copied = $state(false);
+  let shareLink = $state('');
+  let sharing = $state(false);
   let showMenu = $state(false);
 
   // Format annotations for Claude Code
@@ -86,6 +88,32 @@
     showMenu = false;
   }
 
+  async function createShareLink() {
+    if (!fileContent || !annotationData) return;
+
+    sharing = true;
+    try {
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName,
+          content: fileContent,
+          annotations: annotationData
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        shareLink = data.url;
+        await navigator.clipboard.writeText(data.url);
+      }
+    } catch (e) {
+      console.error('Failed to create share link:', e);
+    }
+    sharing = false;
+  }
+
   function handleExport() {
     onExport?.();
     showMenu = false;
@@ -156,7 +184,31 @@
         </button>
 
         {#if showMenu}
-          <div class="absolute right-0 mt-2 w-56 bg-slate-800 rounded-lg shadow-xl border border-slate-600 py-1 z-50">
+          <div class="absolute right-0 mt-2 w-64 bg-slate-800 rounded-lg shadow-xl border border-slate-600 py-1 z-50">
+            <!-- Share Link -->
+            <button
+              class="w-full px-4 py-2.5 text-left text-sm text-slate-200 hover:bg-slate-700 flex items-center gap-3 border-b border-slate-700"
+              onclick={createShareLink}
+              disabled={sharing}
+            >
+              <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+              </svg>
+              {sharing ? 'Creating...' : shareLink ? 'Link Copied!' : 'Copy Share Link'}
+            </button>
+
+            {#if shareLink}
+              <div class="px-4 py-2 border-b border-slate-700">
+                <input
+                  type="text"
+                  value={shareLink}
+                  readonly
+                  class="w-full px-2 py-1 text-xs bg-slate-900 border border-slate-600 rounded text-slate-300"
+                  onclick={(e) => (e.target as HTMLInputElement).select()}
+                />
+              </div>
+            {/if}
+
             <button
               class="w-full px-4 py-2 text-left text-sm text-slate-200 hover:bg-slate-700 flex items-center gap-3"
               onclick={copyForClaude}
