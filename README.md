@@ -1,3 +1,4 @@
+### 🚨🚨 Beta Launch in 2 days...
 # Ano
 
 **Collaborative annotation and review for Claude Code**
