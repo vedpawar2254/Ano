@@ -4,28 +4,6 @@
   "fileHash": "58c156e05536",
   "annotations": [
     {
-      "id": "2cea2d21-8fd2-4952-b7dd-36ba40b6f780",
-      "anchor": {
-        "line": 10,
-        "contextBefore": "### 1. Inline Annotations\n- Add comments to specific lines/sections in plans and markdown",
-        "contextAfter": "- Mark comments as resolved/unresolved\n",
-        "contentHash": "bbe6d266ad20"
-      },
-      "type": "question",
-      "author": "ved",
-      "timestamp": "2026-01-13T19:34:43.619Z",
-      "content": "Should we add more annotation types?",
-      "status": "resolved",
-      "replies": [
-        {
-          "id": "e3a419c5-76cf-494a-a901-c796eb3fbae6",
-          "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-          "timestamp": "2026-01-13T20:57:17.726Z",
-          "content": "Good question!"
-        }
-      ]
-    },
-    {
       "id": "1d9cb93b-da42-4131-a621-8114ae2e48c2",
       "anchor": {
         "line": 44,
@@ -86,36 +64,6 @@
       "replies": []
     },
     {
-      "id": "4abbad62-363d-4a0d-8f3c-9ea2def0f97a",
-      "anchor": {
-        "line": 9,
-        "contextBefore": "\n### 1. Inline Annotations",
-        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
-        "contentHash": "003d669c3ab4"
-      },
-      "type": "concern",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-13T21:32:11.322Z",
-      "content": "argdvrad",
-      "status": "resolved",
-      "replies": []
-    },
-    {
-      "id": "ae93ab2c-c429-4414-8ee0-9bb59687ed0e",
-      "anchor": {
-        "line": 9,
-        "contextBefore": "\n### 1. Inline Annotations",
-        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
-        "contentHash": "003d669c3ab4"
-      },
-      "type": "suggestion",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-13T21:32:20.894Z",
-      "content": "asfvdafv",
-      "status": "resolved",
-      "replies": []
-    },
-    {
       "id": "48d166ce-9041-465f-a77b-537c1b9487b3",
       "anchor": {
         "line": 10,
@@ -148,54 +96,6 @@
       "replies": []
     },
     {
-      "id": "631f7a50-7f80-445f-a21a-7d9d810f9084",
-      "anchor": {
-        "line": 4,
-        "endLine": 9,
-        "contextBefore": "\n## Vision",
-        "contextAfter": "- Support threaded discussions on annotations\n- Mark comments as resolved/unresolved",
-        "contentHash": "f29f7870db2b"
-      },
-      "type": "question",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-13T21:42:38.974Z",
-      "content": "asdasd",
-      "status": "resolved",
-      "replies": []
-    },
-    {
-      "id": "56f0cea0-8fc8-49d3-9414-0a35c7a3ad02",
-      "anchor": {
-        "line": 4,
-        "endLine": 15,
-        "contextBefore": "\n## Vision",
-        "contextAfter": "- `question` - Clarification needed\n- `suggestion` - Improvement idea",
-        "contentHash": "1d438f07bc40"
-      },
-      "type": "blocker",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-13T21:42:48.679Z",
-      "content": "asdfvadfvc",
-      "status": "resolved",
-      "replies": []
-    },
-    {
-      "id": "d38e29c6-7498-49b4-8c4c-9c243fe3bcc2",
-      "anchor": {
-        "line": 9,
-        "endLine": 15,
-        "contextBefore": "\n### 1. Inline Annotations",
-        "contextAfter": "- `question` - Clarification needed\n- `suggestion` - Improvement idea",
-        "contentHash": "ac52eff60c8c"
-      },
-      "type": "question",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-13T21:47:31.228Z",
-      "content": "hjbvjhbhjbubgubghbuyhbhgbubghb",
-      "status": "resolved",
-      "replies": []
-    },
-    {
       "id": "e7a9e89b-e43c-4f21-8146-5cd1d2584daa",
       "anchor": {
         "line": 42,
@@ -224,22 +124,6 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-14T06:38:23.626Z",
       "content": "ved's anotation",
-      "status": "resolved",
-      "replies": []
-    },
-    {
-      "id": "b656bb44-790e-4a77-b469-01fbb5cfe667",
-      "anchor": {
-        "line": 9,
-        "endLine": 24,
-        "contextBefore": "\n### 1. Inline Annotations",
-        "contextAfter": "### 4. Claude Integration\n- Claude can read annotations when asked",
-        "contentHash": "c23c8532b3db"
-      },
-      "type": "concern",
-      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
-      "timestamp": "2026-01-14T06:39:11.992Z",
-      "content": "asdcsd",
       "status": "resolved",
       "replies": []
     },
@@ -288,7 +172,7 @@
       "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
       "timestamp": "2026-01-14T07:21:39.047Z",
       "content": "asdfasdf",
-      "status": "open",
+      "status": "resolved",
       "replies": []
     }
   ],
