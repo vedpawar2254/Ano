@@ -9,6 +9,11 @@ const commandOutputs: Record<string, () => React.ReactNode> = {
   'ano status': () => <StatusOutput />,
   'ano approve': () => <ApproveOutput />,
   'ano approve --all': () => <ApproveOutput all />,
+  'ano lgtm plan.md': () => <LgtmOutput />,
+  'ano shipit plan.md': () => <ShipitOutput />,
+  'ano nit plan.md:4 "check timing"': () => <NitOutput />,
+  'ano block plan.md:8 "needs QA"': () => <BlockOutput />,
+  'ano question plan.md:10 "rollback?"': () => <QuestionOutput />,
   'ano export': () => <ExportOutput />,
   'ano export --format md': () => <ExportOutput format="md" />,
   'ano help': () => <HelpOutput />,
@@ -22,6 +27,11 @@ const commands = [
   'ano serve',
   'ano review plan.md',
   'ano status',
+  'ano lgtm plan.md',
+  'ano shipit plan.md',
+  'ano nit plan.md:4 "check timing"',
+  'ano block plan.md:8 "needs QA"',
+  'ano question plan.md:10 "rollback?"',
   'ano approve --all',
   'ano export',
   'ano help',
@@ -30,6 +40,24 @@ const commands = [
   'ano users',
   'clear',
 ];
+
+// Helper to get display name for commands
+function getCommandDisplay(cmd: string): string {
+  if (cmd === 'clear') return 'clear';
+  const display = cmd.replace('ano ', '');
+
+  // Custom short names for quick commands
+  if (display.startsWith('nit ')) return 'nit :line';
+  if (display.startsWith('block ')) return 'block :line';
+  if (display.startsWith('question ')) return 'question :line';
+
+  // Truncate other long commands
+  if (display.length > 20) {
+    const parts = display.split(' ');
+    return parts[0] + (parts.length > 1 ? '...' : '');
+  }
+  return display;
+}
 
 export function TerminalDemo() {
   const [input, setInput] = useState('');
@@ -103,7 +131,7 @@ export function TerminalDemo() {
         </div>
 
         <div className="flex gap-3" style={{ display: 'flex', flexDirection: 'row' }}>
-          <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-3 overflow-hidden" style={{ width: '160px', flexShrink: 0 }}>
+          <div className="bg-zinc-950 rounded-xl border border-zinc-800 p-3 overflow-hidden overflow-y-auto" style={{ width: '180px', flexShrink: 0, maxHeight: '500px' }}>
             <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-3">
               Commands
             </p>
@@ -120,8 +148,9 @@ export function TerminalDemo() {
                       ? 'bg-zinc-800 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
                       : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 hover:shadow-[0_0_10px_rgba(16,185,129,0.1)]'
                   }`}
+                  title={cmd}
                 >
-                  {cmd.replace('ano ', '')}
+                  {getCommandDisplay(cmd)}
                 </button>
               ))}
             </div>
@@ -363,6 +392,62 @@ function UsersOutput() {
         <span className="text-zinc-500">Ved</span>
         <span className="text-zinc-700 text-[10px]">idle</span>
       </div>
+    </div>
+  );
+}
+
+function LgtmOutput() {
+  return (
+    <div className="font-mono text-xs space-y-1">
+      <div className="text-emerald-400">✓ Approved: plan.md</div>
+      <div className="text-zinc-500 text-[10px] mt-2">Comment: "Looks good to me"</div>
+      <div className="text-zinc-600 text-[10px]">Status: 3/3 approvals</div>
+    </div>
+  );
+}
+
+function ShipitOutput() {
+  return (
+    <div className="font-mono text-xs space-y-1">
+      <div className="text-emerald-400">✓ Strong approval: plan.md</div>
+      <div className="text-zinc-500 text-[10px] mt-2">Comment: "Ship it!"</div>
+      <div className="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+        <div className="text-emerald-400 font-medium">Ready to execute</div>
+        <div className="text-zinc-500 text-[10px] mt-1">All approvals collected</div>
+      </div>
+    </div>
+  );
+}
+
+function NitOutput() {
+  return (
+    <div className="font-mono text-xs space-y-1">
+      <div className="text-amber-400">⚠ Nitpick added: plan.md:4</div>
+      <div className="text-zinc-500 text-[10px] mt-2">"check timing"</div>
+      <div className="text-zinc-600 text-[10px]">Type: nit (non-blocking)</div>
+    </div>
+  );
+}
+
+function BlockOutput() {
+  return (
+    <div className="font-mono text-xs space-y-1">
+      <div className="text-red-400">⛔ Blocker added: plan.md:8</div>
+      <div className="text-zinc-500 text-[10px] mt-2">"needs QA"</div>
+      <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+        <div className="text-red-400 font-medium">Execution blocked</div>
+        <div className="text-zinc-500 text-[10px] mt-1">1 unresolved blocker</div>
+      </div>
+    </div>
+  );
+}
+
+function QuestionOutput() {
+  return (
+    <div className="font-mono text-xs space-y-1">
+      <div className="text-blue-400">❓ Question added: plan.md:10</div>
+      <div className="text-zinc-500 text-[10px] mt-2">"rollback?"</div>
+      <div className="text-zinc-600 text-[10px]">Type: question</div>
     </div>
   );
 }
