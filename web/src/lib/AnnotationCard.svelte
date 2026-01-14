@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Annotation, Reply } from './types';
+  import Markdown from './Markdown.svelte';
 
   interface Props {
     annotation: Annotation;
@@ -104,9 +105,9 @@
     </div>
 
     <!-- Content -->
-    <p class="text-[13px] text-surface-300 mb-2 {isSelected ? '' : 'line-clamp-2'}">
-      {annotation.content}
-    </p>
+    <div class="text-[13px] text-surface-300 mb-2 {isSelected ? '' : 'line-clamp-2'}">
+      <Markdown content={annotation.content} />
+    </div>
 
     <!-- Footer -->
     <div class="flex items-center justify-between text-[11px] text-surface-600">
@@ -123,7 +124,7 @@
         <div class="space-y-2">
           {#each annotation.replies as reply}
             <div class="pl-3 border-l-2 border-surface-700">
-              <p class="text-[12px] text-surface-300">{reply.content}</p>
+              <div class="text-[12px] text-surface-300"><Markdown content={reply.content} /></div>
               <div class="flex items-center gap-2 mt-1 text-[10px] text-surface-600">
                 <span>{reply.author.split('<')[0].trim()}</span>
                 <span>{formatTime(reply.timestamp)}</span>

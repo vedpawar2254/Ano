@@ -2,6 +2,7 @@
   import type { Annotation, Approval } from './types';
   import AnnotationCard from './AnnotationCard.svelte';
   import ApprovalCard from './ApprovalCard.svelte';
+  import ActivityFeed from './ActivityFeed.svelte';
 
   interface Props {
     annotations: Annotation[];
@@ -18,6 +19,7 @@
 
   let filter = $state<'all' | 'open' | 'blockers'>('all');
   let searchQuery = $state('');
+  let viewMode = $state<'annotations' | 'activity'>('annotations');
 
   let filteredAnnotations = $derived(() => {
     let result = annotations;
@@ -56,8 +58,29 @@
 </script>
 
 <div class="flex flex-col h-full">
+  <!-- View Mode Toggle -->
+  <div class="px-4 pt-4 pb-2 flex gap-1">
+    <button
+      class="flex-1 py-1.5 text-[12px] font-medium rounded-lg transition-colors {viewMode === 'annotations'
+        ? 'bg-surface-800 text-surface-200'
+        : 'text-surface-500 hover:text-surface-300'}"
+      onclick={() => viewMode = 'annotations'}
+    >
+      Annotations
+    </button>
+    <button
+      class="flex-1 py-1.5 text-[12px] font-medium rounded-lg transition-colors {viewMode === 'activity'
+        ? 'bg-surface-800 text-surface-200'
+        : 'text-surface-500 hover:text-surface-300'}"
+      onclick={() => viewMode = 'activity'}
+    >
+      Activity
+    </button>
+  </div>
+
+  {#if viewMode === 'annotations'}
   <!-- Search -->
-  <div class="px-4 pt-4 pb-3">
+  <div class="px-4 pt-2 pb-3">
     <input
       type="text"
       bind:value={searchQuery}

@@ -545,9 +545,51 @@ This is a sample plan file to demonstrate the annotation viewer.
       .replace(/"/g, '&quot;');
   }
 
+  // Set up SSE connection for real-time updates
+  let eventSource: EventSource | null = null;
+
+  function setupSSE() {
+    if (eventSource) {
+      eventSource.close();
+    }
+
+    eventSource = new EventSource('/api/events');
+
+    eventSource.addEventListener('connected', () => {
+      console.log('Live reload connected');
+    });
+
+    eventSource.addEventListener('fileChanged', () => {
+      console.log('File changed, reloading...');
+      loadData();
+    });
+
+    eventSource.addEventListener('annotationsChanged', () => {
+      console.log('Annotations changed, reloading...');
+      loadData();
+    });
+
+    eventSource.onerror = () => {
+      // Try to reconnect after 3 seconds
+      setTimeout(() => {
+        if (eventSource?.readyState === EventSource.CLOSED) {
+          setupSSE();
+        }
+      }, 3000);
+    };
+  }
+
   $effect(() => {
     loadData();
     loadFiles();
+    setupSSE();
+
+    // Cleanup on unmount
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
   });
 </script>
 
@@ -598,4 +640,84 @@ This is a sample plan file to demonstrate the annotation viewer.
     onSubmit={handleAddAnnotation}
     onCancel={handleCancelModal}
   />
+{/if}
+
+{#if showKeyboardHelp}
+  <div
+    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+    onclick={() => showKeyboardHelp = false}
+    onkeydown={(e) => e.key === 'Escape' && (showKeyboardHelp = false)}
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+  >
+    <div
+      class="bg-surface-900 border border-surface-700 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
+      onclick={(e) => e.stopPropagation()}
+    >
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-surface-200">Keyboard Shortcuts</h2>
+        <button
+          class="text-surface-500 hover:text-surface-300 text-xl leading-none"
+          onclick={() => showKeyboardHelp = false}
+        >&times;</button>
+      </div>
+
+      <div class="space-y-4 text-[13px]">
+        <div>
+          <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-2">Navigation</h3>
+          <div class="space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-surface-400">Next annotation</span>
+              <span class="text-surface-300 font-mono">j / ↓</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Previous annotation</span>
+              <span class="text-surface-300 font-mono">k / ↑</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Focus search</span>
+              <span class="text-surface-300 font-mono">/</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-2">Actions</h3>
+          <div class="space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-surface-400">Add annotation at line</span>
+              <span class="text-surface-300 font-mono">a</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Resolve selected</span>
+              <span class="text-surface-300 font-mono">r</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Reopen selected</span>
+              <span class="text-surface-300 font-mono">u</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Delete selected</span>
+              <span class="text-surface-300 font-mono">Shift+D</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-2">General</h3>
+          <div class="space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-surface-400">Show this help</span>
+              <span class="text-surface-300 font-mono">?</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-surface-400">Close / Deselect</span>
+              <span class="text-surface-300 font-mono">Esc</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {/if}

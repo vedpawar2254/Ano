@@ -13,10 +13,24 @@ import chalk from 'chalk';
 import { resolve, dirname, basename } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
-import { existsSync } from 'node:fs';
+import { existsSync, watch, FSWatcher } from 'node:fs';
 import { readAnnotationFile, addAnnotation, resolveAnnotation, setApproval, addReply, deleteAnnotation, reopenAnnotation } from '../../core/annotations.js';
 import { getAuthorString } from '../../core/config.js';
 import type { AnnotationType, ApprovalStatus } from '../../core/types.js';
+
+// SSE client connections
+const sseClients: Set<ServerResponse> = new Set();
+
+// File watchers
+const fileWatchers: Map<string, FSWatcher> = new Map();
+
+// Broadcast to all SSE clients
+function broadcast(event: string, data: any) {
+  const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const client of sseClients) {
+    client.write(message);
+  }
+}
 
 // Simple static file server
 const MIME_TYPES: Record<string, string> = {
@@ -345,6 +359,29 @@ export const serveCommand = new Command('serve')
         return;
       }
 
+      // SSE endpoint for real-time updates
+      if (url === '/api/events' && req.method === 'GET') {
+        res.writeHead(200, {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'Access-Control-Allow-Origin': '*',
+        });
+
+        // Send initial connection confirmation
+        res.write('event: connected\ndata: {}\n\n');
+
+        // Add to clients set
+        sseClients.add(res);
+
+        // Remove on disconnect
+        req.on('close', () => {
+          sseClients.delete(res);
+        });
+
+        return;
+      }
+
       // API endpoint to share annotations via paste service
       if (url === '/api/share' && req.method === 'POST') {
         try {
@@ -433,9 +470,42 @@ export const serveCommand = new Command('serve')
       console.log();
       console.log(`  ${chalk.bold('Files:')}  ${filePaths.map(fp => basename(fp)).join(', ')}`);
       console.log(`  ${chalk.bold('URL:')}    ${chalk.cyan(`http://localhost:${port}`)}`);
+      console.log(chalk.dim('  Live reload enabled'));
       console.log();
       console.log(chalk.dim('  Press Ctrl+C to stop'));
       console.log();
+
+      // Set up file watchers for all served files
+      for (const fp of filePaths) {
+        // Watch the main file
+        if (existsSync(fp)) {
+          try {
+            const watcher = watch(fp, { persistent: true }, (eventType) => {
+              if (eventType === 'change') {
+                broadcast('fileChanged', { file: basename(fp), path: fp });
+              }
+            });
+            fileWatchers.set(fp, watcher);
+          } catch (e) {
+            console.error(chalk.yellow(`  Warning: Could not watch ${basename(fp)}`));
+          }
+        }
+
+        // Watch the annotation file
+        const annotationPath = `${fp}.annotations.json`;
+        if (existsSync(annotationPath)) {
+          try {
+            const watcher = watch(annotationPath, { persistent: true }, (eventType) => {
+              if (eventType === 'change') {
+                broadcast('annotationsChanged', { file: basename(fp), path: fp });
+              }
+            });
+            fileWatchers.set(annotationPath, watcher);
+          } catch (e) {
+            console.error(chalk.yellow(`  Warning: Could not watch annotations for ${basename(fp)}`));
+          }
+        }
+      }
 
       // Open browser if requested
       if (options.open) {
@@ -445,6 +515,14 @@ export const serveCommand = new Command('serve')
           exec(`${openCommand} http://localhost:${port}`);
         });
       }
+    });
+
+    // Cleanup on exit
+    process.on('SIGINT', () => {
+      for (const watcher of fileWatchers.values()) {
+        watcher.close();
+      }
+      process.exit(0);
     });
   });
 
