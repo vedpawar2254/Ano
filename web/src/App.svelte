@@ -22,6 +22,11 @@
   let fileViewerContainer: HTMLDivElement;
   let files = $state<FileInfo[]>([]);
 
+  // Track initial annotations for diff view
+  let initialAnnotations = $state<Annotation[]>([]);
+  let initialApprovals = $state<{ author: string; title?: string; status: string; timestamp: string; comment?: string }[]>([]);
+  let hasStoredInitial = $state(false);
+
   // Modal state
   let showAddModal = $state(false);
   let addModalLine = $state(0);
@@ -58,6 +63,11 @@
         body: JSON.stringify({ filePath })
       });
       if (response.ok) {
+        // Reset diff tracking for new file
+        hasStoredInitial = false;
+        initialAnnotations = [];
+        initialApprovals = [];
+
         await loadData();
         await loadFiles();
         // Clear selection state when switching files
@@ -77,6 +87,13 @@
       fileContent = data.content;
       fileName = data.fileName;
       annotationData = data.annotations;
+
+      // Store initial state for diff view (only on first load)
+      if (!hasStoredInitial && annotationData) {
+        initialAnnotations = [...annotationData.annotations];
+        initialApprovals = [...annotationData.approvals];
+        hasStoredInitial = true;
+      }
     } catch (e) {
       // Demo mode
       fileContent = `# Sample Plan
@@ -623,6 +640,8 @@ This is a sample plan file to demonstrate the annotation viewer.
         onReopen={handleReopen}
         onDelete={handleDelete}
         onReply={handleReply}
+        previousAnnotations={initialAnnotations}
+        previousApprovals={initialApprovals}
       />
     </div>
   </div>

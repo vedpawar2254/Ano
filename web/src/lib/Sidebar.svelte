@@ -3,6 +3,7 @@
   import AnnotationCard from './AnnotationCard.svelte';
   import ApprovalCard from './ApprovalCard.svelte';
   import ActivityFeed from './ActivityFeed.svelte';
+  import DiffView from './DiffView.svelte';
 
   interface Props {
     annotations: Annotation[];
@@ -13,13 +14,15 @@
     onReopen?: (annotationId: string) => void;
     onDelete?: (annotationId: string) => void;
     onReply?: (annotationId: string, content: string) => void;
+    previousAnnotations?: Annotation[];
+    previousApprovals?: Approval[];
   }
 
-  let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve, onReopen, onDelete, onReply }: Props = $props();
+  let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve, onReopen, onDelete, onReply, previousAnnotations = [], previousApprovals = [] }: Props = $props();
 
   let filter = $state<'all' | 'open' | 'blockers'>('all');
   let searchQuery = $state('');
-  let viewMode = $state<'annotations' | 'activity'>('annotations');
+  let viewMode = $state<'annotations' | 'activity' | 'changes'>('annotations');
 
   let filteredAnnotations = $derived(() => {
     let result = annotations;
@@ -75,6 +78,14 @@
       onclick={() => viewMode = 'activity'}
     >
       Activity
+    </button>
+    <button
+      class="flex-1 py-1.5 text-[12px] font-medium rounded-lg transition-colors {viewMode === 'changes'
+        ? 'bg-surface-800 text-surface-200'
+        : 'text-surface-500 hover:text-surface-300'}"
+      onclick={() => viewMode = 'changes'}
+    >
+      Changes
     </button>
   </div>
 
@@ -156,13 +167,27 @@
       {/if}
     </div>
   </div>
-  {:else}
+  {:else if viewMode === 'activity'}
   <!-- Activity Feed View -->
   <div class="flex-1 overflow-auto p-4">
     <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-3">
       Recent Activity
     </h3>
     <ActivityFeed {annotations} {approvals} onAnnotationClick={onAnnotationClick} />
+  </div>
+  {:else}
+  <!-- Changes/Diff View -->
+  <div class="flex-1 overflow-auto p-4">
+    <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-3">
+      Changes Since Load
+    </h3>
+    <DiffView
+      {annotations}
+      {approvals}
+      {previousAnnotations}
+      {previousApprovals}
+      onAnnotationClick={onAnnotationClick}
+    />
   </div>
   {/if}
 </div>
