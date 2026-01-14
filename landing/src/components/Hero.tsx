@@ -109,8 +109,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-6 text-lg text-zinc-500 max-w-lg mx-auto"
           >
-            Your team annotates and approves Claude's plans before execution.
-            Human oversight for AI-assisted development.
+            Refine and iterate on Claude's plans with your team.
+            Better tooling for steering AI.
           </motion.p>
 
           {/* Install command */}
@@ -154,7 +154,7 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="mt-3 text-xs text-zinc-600"
           >
-            npm package coming soon - <a href="https://github.com/vedpawar2254/Ano" className="text-zinc-500 hover:text-emerald-500 transition-colors">install from source</a>
+            npm package coming soon <a href="https://github.com/vedpawar2254/Ano" className="text-zinc-500 hover:text-emerald-500 transition-colors"></a>
           </motion.p>
 
           {/* Social proof */}

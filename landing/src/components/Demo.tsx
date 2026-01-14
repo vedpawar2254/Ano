@@ -27,10 +27,10 @@ export function Demo() {
         >
           <p className="text-emerald-500 text-sm font-medium mb-3">The interface</p>
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-            Review collaboratively in the browser
+            Refine plans together
           </h2>
           <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
-            Your team annotates plans in real-time. Claude reads the feedback and adapts.
+            Your team reviews and annotates in real-time. Claude sees the feedback and iterates.
           </p>
         </motion.div>
 
@@ -181,18 +181,18 @@ export function Demo() {
           <div className="grid md:grid-cols-3 gap-8">
             <WorkflowStep
               step="1"
-              title="Claude generates a plan"
-              description="Your AI assistant creates a detailed plan for the task at hand."
+              title="AI generates a plan"
+              description="Claude creates a detailed implementation plan."
             />
             <WorkflowStep
               step="2"
-              title="Team reviews together"
-              description="Add annotations, flag blockers, and discuss in real-time."
+              title="Team refines it"
+              description="Review, annotate, and flag concerns collaboratively."
             />
             <WorkflowStep
               step="3"
-              title="Claude reads feedback"
-              description="The AI sees your annotations and adapts the plan accordingly."
+              title="AI adapts"
+              description="Claude sees feedback and iterates on the plan."
             />
           </div>
         </motion.div>

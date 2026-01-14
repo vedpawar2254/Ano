@@ -11,8 +11,8 @@ const features = [
     description: 'Plans are blocked until your team signs off. Track who approved and when.',
   },
   {
-    title: 'Claude reads feedback',
-    description: 'AI sees your annotations and can respond. True human-AI collaboration.',
+    title: 'AI sees your feedback',
+    description: 'Claude reads your annotations and iterates on the plan.',
   },
   {
     title: 'Real-time presence',
@@ -55,10 +55,10 @@ export function Features() {
         >
           <p className="text-emerald-500 text-sm font-medium mb-3">Features</p>
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4">
-            Human oversight for AI plans
+            Built for the new workflow
           </h2>
           <p className="text-zinc-500 text-lg max-w-xl">
-            Everything your team needs to review, discuss, and approve before Claude executes.
+            Everything you need to refine plans and steer AI with your team.
           </p>
         </motion.div>
 

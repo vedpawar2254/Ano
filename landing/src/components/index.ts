@@ -1,7 +1,10 @@
 export { FlowingRibbon } from './FlowingRibbon';
 export { Hero } from './Hero';
+export { Problem } from './Problem';
 export { Features } from './Features';
-export { Demo } from './Demo';
 export { TerminalDemo } from './TerminalDemo';
+export { QuickCommands } from './QuickCommands';
+export { MCPSection } from './MCPSection';
+export { Demo } from './Demo';
 export { Footer } from './Footer';
 export { Logo, LogoMark } from './Logo';
