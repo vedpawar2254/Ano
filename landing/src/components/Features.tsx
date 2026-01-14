@@ -70,6 +70,8 @@ export function Features() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.05 }}
+              whileHover={{ scale: 1.02 }}
+              className="p-6 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300"
             >
               <h3 className="text-white font-medium mb-2">
                 {feature.title}

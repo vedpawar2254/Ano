@@ -122,7 +122,7 @@ export function Hero() {
           >
             <button
               onClick={copyCommand}
-              className="group flex items-center gap-3 px-5 py-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors"
+              className="group flex items-center gap-3 px-5 py-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300"
             >
               <span className="font-mono text-sm text-zinc-300">
                 npm install -g ano

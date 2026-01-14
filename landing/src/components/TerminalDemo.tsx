@@ -115,10 +115,10 @@ export function TerminalDemo() {
                     setInput(cmd);
                     focusInput();
                   }}
-                  className={`w-full text-left px-2 py-1.5 rounded text-xs font-mono transition-colors ${
+                  className={`w-full text-left px-2 py-1.5 rounded text-xs font-mono transition-all duration-200 ${
                     currentCommand === cmd
-                      ? 'bg-zinc-800 text-emerald-400'
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900'
+                      ? 'bg-zinc-800 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900 hover:shadow-[0_0_10px_rgba(16,185,129,0.1)]'
                   }`}
                 >
                   {cmd.replace('ano ', '')}

@@ -57,7 +57,7 @@ export function Problem() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.1 * index }}
-              className="p-5 rounded-lg border border-zinc-800 bg-zinc-900/30"
+              className="p-5 rounded-lg border border-zinc-800 bg-zinc-900/30 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300"
             >
               <h3 className="text-base font-medium text-white mb-2">{problem.title}</h3>
               <p className="text-zinc-500 text-sm leading-relaxed">{problem.description}</p>

@@ -275,11 +275,14 @@ function AnnotationCard({
 }) {
   const borderClass = type === 'concern' ? 'border-amber-500/20' : 'border-red-500/20';
   const typeColor = type === 'concern' ? 'text-amber-500' : 'text-red-500';
+  const hoverGlow = type === 'concern'
+    ? 'hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+    : 'hover:shadow-[0_0_15px_rgba(239,68,68,0.15)]';
 
   return (
     <div
       onClick={onClick}
-      className={`rounded-lg border ${borderClass} cursor-pointer transition-colors ${
+      className={`rounded-lg border ${borderClass} cursor-pointer transition-all duration-300 ${hoverGlow} ${
         selected ? 'bg-zinc-800' : 'bg-zinc-900/50 hover:bg-zinc-800/50'
       }`}
     >
