@@ -4,12 +4,18 @@
 
 Ano enables teams to annotate, review, and approve Claude-generated plans and markdown files before execution. It integrates with Claude Code via MCP and hooks, creating a human-in-the-loop workflow for AI-assisted development.
 
-## Features 
+## Features
 
 - **Inline Annotations** - Add comments to specific lines with types: `concern`, `question`, `suggestion`, `blocker`
 - **Approval Gates** - Require N approvals before Claude can proceed (via hooks)
+- **Title & Role-Based Authorization** - Require approval from specific roles (e.g., "Tech Lead", "Security")
 - **Team Management** - Configure team members, roles, and approval requirements
-- **Web Viewer** - Visual interface to view and manage annotations
+- **Web Viewer** - Visual interface with real-time updates, keyboard shortcuts, and inline editing
+- **Activity Feed** - Track all annotation and approval changes chronologically
+- **Version Diff** - Compare changes between versions, see what was added/removed/resolved
+- **Shareable URLs** - Deep links to specific annotations or lines
+- **Export** - Export annotated files as standalone HTML or copy for Claude
+- **Multi-file Support** - Review multiple files in a single session
 - **Claude Integration** - Claude can read and respond to annotations via MCP
 - **Git-Friendly** - All data stored in sidecar JSON files alongside your code
 
@@ -33,6 +39,9 @@ ano check plan.md
 
 # Start web viewer
 ano serve plan.md
+
+# Start web viewer with multiple files
+ano serve plan.md README.md design.md
 ```
 
 ## Installation
@@ -57,8 +66,10 @@ npm link
 | Command | Description |
 |---------|-------------|
 | `ano annotate <file>:<line> "msg"` | Add annotation to a specific line |
+| `ano annotate <file>:<start>-<end> "msg"` | Add annotation spanning multiple lines |
 | `ano list <file>` | List all annotations for a file |
 | `ano resolve <file> <id>` | Mark annotation as resolved |
+| `ano reopen <file> <id>` | Reopen a resolved annotation |
 | `ano reply <file> <id> "msg"` | Add threaded reply |
 | `ano delete <file> <id>` | Delete an annotation |
 | `ano sync <file>` | Sync annotation positions after file changes |
@@ -78,9 +89,21 @@ npm link
 | Command | Description |
 |---------|-------------|
 | `ano approve <file>` | Add approval with optional title |
+| `ano approve <file> --title "Tech Lead"` | Approve with a title (for role-based gates) |
 | `ano check <file>` | Verify approval requirements (exit 0/1) |
+| `ano check <file> --required 2` | Require specific number of approvals |
+| `ano check <file> --require-title "Tech Lead"` | Require approval from specific title |
+| `ano check <file> --require-role lead` | Require approval from specific team role |
 | `ano check <file> --soft` | Warn but don't block |
 | `ano check <file> --override --reason "msg"` | Bypass with audit trail |
+| `ano check <file> --json` | Output result as JSON |
+
+### Version Comparison
+
+| Command | Description |
+|---------|-------------|
+| `ano diff <file>` | Show changes from previous version |
+| `ano diff <file> --json` | Output diff as JSON |
 
 ### Team Management
 
@@ -97,7 +120,51 @@ npm link
 | Command | Description |
 |---------|-------------|
 | `ano serve <file>` | Start web viewer on localhost:3000 |
+| `ano serve <files...>` | View multiple files with tab switching |
 | `ano serve <file> --port 8080` | Use custom port |
+| `ano serve <file> --no-open` | Don't open browser automatically |
+
+## Web Viewer Features
+
+The web viewer provides a rich interface for reviewing annotated files:
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `j` / `↓` | Next annotation |
+| `k` / `↑` | Previous annotation |
+| `r` | Resolve selected annotation |
+| `u` | Reopen selected annotation |
+| `Shift+D` | Delete selected annotation |
+| `a` | Add annotation at selected line |
+| `/` | Focus search |
+| `?` | Show keyboard shortcuts help |
+| `Esc` | Close modal / deselect |
+
+### Views
+
+- **Annotations** - List and filter annotations by status (all/open/blockers)
+- **Activity** - Chronological feed of all annotation and approval changes
+- **Changes** - Diff view showing what changed since page load (added, removed, resolved, reopened)
+
+### Sharing
+
+- **Copy link to view** - Deep link to current annotation/line selection
+- **Copy for Claude** - Formatted markdown summary of open annotations
+- **Export HTML** - Standalone HTML file with all annotations embedded
+
+### Inline Editing
+
+Double-click any line to edit it directly. Changes are saved automatically.
+
+### Text Selection
+
+Select text across lines to add annotations to specific ranges.
+
+### Real-time Updates
+
+The viewer uses Server-Sent Events (SSE) to automatically refresh when files or annotations change.
 
 ## Claude Code Integration
 
@@ -139,9 +206,34 @@ Block Claude from executing plans without approval:
 }
 ```
 
+#### Advanced Hook Examples
+
+Require Tech Lead approval:
+```json
+{
+  "command": "ano check PLAN.md --require-title 'Tech Lead' --quiet"
+}
+```
+
+Require 2 approvals from team leads:
+```json
+{
+  "command": "ano check PLAN.md --required 2 --require-role lead --quiet"
+}
+```
+
+Soft gate (warn but don't block):
+```json
+{
+  "command": "ano check PLAN.md --soft --quiet"
+}
+```
+
 Exit codes:
 - `0` = Approved, Claude proceeds
 - `1` = Not approved, Claude blocked
+
+Override logs are written to `.ano-overrides.log` for audit trails.
 
 ## Team Configuration
 
@@ -160,10 +252,21 @@ Team config is stored in `.ano/config.json`:
     "reviewer": { "canOverride": false, "weight": 1 }
   },
   "requirements": {
-    "minApprovals": 2
+    "minApprovals": 2,
+    "requiredRoles": ["lead"],
+    "requiredTitles": ["Tech Lead"]
   }
 }
 ```
+
+### Requirements Options
+
+| Field | Description |
+|-------|-------------|
+| `minApprovals` | Minimum number of approvals required |
+| `minWeight` | Minimum total weight of approvals (based on role weights) |
+| `requiredRoles` | Roles that must approve (matches team member roles) |
+| `requiredTitles` | Titles that must approve (matches approval titles) |
 
 Team membership is **advisory only** - anyone can approve, but `ano check` shows who is/isn't in the team.
 
@@ -181,10 +284,20 @@ This keeps annotations git-tracked and version-controlled with your code.
 When files change, annotations can become misaligned. Ano uses **content anchoring** to relocate annotations:
 
 1. Stores surrounding context (2 lines before/after)
-2. On file change, searches for matching context
-3. Uses fuzzy matching (Levenshtein distance) for tolerance
+2. Stores content hash for change detection
+3. On file change, searches for matching context
+4. Uses fuzzy matching (Levenshtein distance) for tolerance
 
 Run `ano sync <file>` to update positions after major edits.
+
+### Shareable URLs
+
+URLs encode the current view state:
+- `#annotation=<id>` - Link to specific annotation
+- `#line=<number>` - Link to specific line
+- `#file=<path>` - Link to specific file (multi-file mode)
+
+Example: `http://localhost:3000/#annotation=abc123`
 
 ### Authentication
 
@@ -206,8 +319,9 @@ This makes Ano trust-based (same as git commits).
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│ 2. Team reviews                                         │
-│    ano annotate plan.md:15 "Security concern" --type blocker
+│ 2. Team reviews (via CLI or web viewer)                 │
+│    ano serve plan.md                                    │
+│    ano block plan.md:15 "Security concern"              │
 │    ano q plan.md:30 "Why this approach?"                │
 └─────────────────────────────────────────────────────────┘
                          │
@@ -215,12 +329,13 @@ This makes Ano trust-based (same as git commits).
 ┌─────────────────────────────────────────────────────────┐
 │ 3. Address feedback                                     │
 │    ano resolve plan.md <blocker-id>                     │
-│    (update plan if needed)                              │
+│    (Claude can read annotations via MCP and respond)    │
 └─────────────────────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │ 4. Approve                                              │
+│    ano approve plan.md --title "Tech Lead"              │
 │    ano lgtm plan.md                                     │
 └─────────────────────────────────────────────────────────┘
                          │
@@ -247,16 +362,40 @@ ano/
 │   ├── cli/            # CLI commands
 │   │   ├── index.ts         # Entry point
 │   │   └── commands/        # Individual commands
+│   │       ├── annotate.ts
+│   │       ├── approve.ts
+│   │       ├── check.ts
+│   │       ├── diff.ts
+│   │       ├── list.ts
+│   │       ├── serve.ts
+│   │       └── ...
 │   └── mcp/            # MCP server for Claude
 │       └── server.ts
-├── web/                # Svelte web viewer
+├── web/                # Svelte 5 web viewer
 │   ├── src/
 │   │   ├── App.svelte
-│   │   └── lib/            # Components
+│   │   └── lib/
+│   │       ├── FileViewer.svelte
+│   │       ├── Sidebar.svelte
+│   │       ├── AnnotationCard.svelte
+│   │       ├── ActivityFeed.svelte
+│   │       ├── DiffView.svelte
+│   │       └── ...
 │   └── dist/               # Built assets
 ├── hooks/              # Example hook configurations
+│   └── README.md
 └── .ano/               # Team config (per-project)
+    └── config.json
 ```
+
+## Annotation Types
+
+| Type | Purpose | Blocks Execution |
+|------|---------|------------------|
+| `blocker` | Must resolve before proceeding | Yes |
+| `concern` | Risk or issue identified | No |
+| `question` | Clarification needed | No |
+| `suggestion` | Improvement idea | No |
 
 ## License
 
