@@ -9,29 +9,63 @@
     selectedAnnotation: Annotation | null;
     onAnnotationClick: (annotation: Annotation) => void;
     onResolve: (annotationId: string) => void;
+    onReopen?: (annotationId: string) => void;
+    onDelete?: (annotationId: string) => void;
+    onReply?: (annotationId: string, content: string) => void;
   }
 
-  let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve }: Props = $props();
+  let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve, onReopen, onDelete, onReply }: Props = $props();
 
   let filter = $state<'all' | 'open' | 'blockers'>('all');
+  let searchQuery = $state('');
 
   let filteredAnnotations = $derived(() => {
+    let result = annotations;
+
+    // Filter by status/type
     switch (filter) {
       case 'open':
-        return annotations.filter(a => a.status === 'open');
+        result = result.filter(a => a.status === 'open');
+        break;
       case 'blockers':
-        return annotations.filter(a => a.type === 'blocker' && a.status === 'open');
-      default:
-        return annotations;
+        result = result.filter(a => a.type === 'blocker' && a.status === 'open');
+        break;
     }
+
+    // Filter by search query (author or content)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(a =>
+        a.author.toLowerCase().includes(query) ||
+        a.content.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
   });
 
   let sortedAnnotations = $derived(
     [...filteredAnnotations()].sort((a, b) => a.anchor.line - b.anchor.line)
   );
+
+  let stats = $derived({
+    total: annotations.length,
+    open: annotations.filter(a => a.status === 'open').length,
+    blockers: annotations.filter(a => a.type === 'blocker' && a.status === 'open').length
+  });
 </script>
 
 <div class="flex flex-col h-full">
+  <!-- Search -->
+  <div class="px-4 pt-4 pb-3">
+    <input
+      type="text"
+      bind:value={searchQuery}
+      class="w-full px-3 py-2 bg-surface-900 border border-surface-800 rounded-lg text-[13px] text-surface-200 placeholder-surface-600 focus:outline-none focus:border-surface-600"
+      placeholder="Search annotations..."
+    />
+  </div>
+
   <!-- Tabs -->
   <div class="flex border-b border-surface-800/50 px-4">
     <button
@@ -40,7 +74,7 @@
         : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'all'}
     >
-      All
+      All <span class="text-surface-600 ml-1">{stats.total}</span>
     </button>
     <button
       class="px-3 py-3 text-[13px] transition-colors {filter === 'open'
@@ -48,7 +82,7 @@
         : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'open'}
     >
-      Open
+      Open <span class="text-surface-600 ml-1">{stats.open}</span>
     </button>
     <button
       class="px-3 py-3 text-[13px] transition-colors {filter === 'blockers'
@@ -56,7 +90,7 @@
         : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'blockers'}
     >
-      Blockers
+      Blockers <span class="text-surface-600 ml-1">{stats.blockers}</span>
     </button>
   </div>
 
@@ -80,7 +114,7 @@
     <div>
       {#if sortedAnnotations.length === 0}
         <p class="text-surface-600 text-[13px] text-center py-8">
-          No annotations
+          {searchQuery ? 'No matches' : 'No annotations'}
         </p>
       {:else}
         <div class="space-y-2">
@@ -90,6 +124,9 @@
               isSelected={selectedAnnotation?.id === annotation.id}
               onClick={() => onAnnotationClick(annotation)}
               onResolve={onResolve}
+              onReopen={onReopen}
+              onDelete={onDelete}
+              onReply={onReply}
             />
           {/each}
         </div>

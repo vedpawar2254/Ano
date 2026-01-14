@@ -14,7 +14,7 @@ import { resolve, dirname, basename } from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { existsSync } from 'node:fs';
-import { readAnnotationFile, addAnnotation, resolveAnnotation, setApproval } from '../../core/annotations.js';
+import { readAnnotationFile, addAnnotation, resolveAnnotation, setApproval, addReply, deleteAnnotation, reopenAnnotation } from '../../core/annotations.js';
 import { getAuthorString } from '../../core/config.js';
 import type { AnnotationType, ApprovalStatus } from '../../core/types.js';
 
@@ -196,6 +196,92 @@ export const serveCommand = new Command('serve')
 
           const resolved = await resolveAnnotation(currentFilePath, annotationId);
           if (!resolved) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Annotation not found' }));
+            return;
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to add a reply to an annotation
+      if (url === '/api/reply' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { annotationId, content } = body as { annotationId: string; content: string };
+
+          if (!annotationId || !content) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required fields: annotationId, content' }));
+            return;
+          }
+
+          const author = await getAuthorString();
+          const reply = await addReply(currentFilePath, annotationId, author, content);
+
+          if (!reply) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Annotation not found' }));
+            return;
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, reply }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to delete an annotation
+      if (url === '/api/delete' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { annotationId } = body as { annotationId: string };
+
+          if (!annotationId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required field: annotationId' }));
+            return;
+          }
+
+          const deleted = await deleteAnnotation(currentFilePath, annotationId);
+          if (!deleted) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Annotation not found' }));
+            return;
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: (error as Error).message }));
+        }
+        return;
+      }
+
+      // API endpoint to reopen an annotation
+      if (url === '/api/reopen' && req.method === 'POST') {
+        try {
+          const body = await parseJsonBody(req);
+          const { annotationId } = body as { annotationId: string };
+
+          if (!annotationId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing required field: annotationId' }));
+            return;
+          }
+
+          const reopened = await reopenAnnotation(currentFilePath, annotationId);
+          if (!reopened) {
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Annotation not found' }));
             return;

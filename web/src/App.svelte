@@ -247,6 +247,53 @@ This is a sample plan file to demonstrate the annotation viewer.
     }
   }
 
+  // Reopen annotation
+  async function handleReopen(annotationId: string) {
+    try {
+      const response = await fetch('/api/reopen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ annotationId })
+      });
+      if (response.ok) await loadData();
+    } catch (e) {
+      console.error('Failed to reopen:', e);
+    }
+  }
+
+  // Delete annotation
+  async function handleDelete(annotationId: string) {
+    try {
+      const response = await fetch('/api/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ annotationId })
+      });
+      if (response.ok) {
+        if (selectedAnnotation?.id === annotationId) {
+          selectedAnnotation = null;
+        }
+        await loadData();
+      }
+    } catch (e) {
+      console.error('Failed to delete:', e);
+    }
+  }
+
+  // Reply to annotation
+  async function handleReply(annotationId: string, content: string) {
+    try {
+      const response = await fetch('/api/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ annotationId, content })
+      });
+      if (response.ok) await loadData();
+    } catch (e) {
+      console.error('Failed to reply:', e);
+    }
+  }
+
   // Edit a line in the file
   async function handleLineEdit(line: number, newContent: string) {
     const lines = fileContent.split('\n');
@@ -430,6 +477,9 @@ This is a sample plan file to demonstrate the annotation viewer.
         {selectedAnnotation}
         onAnnotationClick={handleAnnotationClick}
         onResolve={handleResolve}
+        onReopen={handleReopen}
+        onDelete={handleDelete}
+        onReply={handleReply}
       />
     </div>
   </div>
