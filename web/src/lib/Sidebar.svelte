@@ -156,4 +156,13 @@
       {/if}
     </div>
   </div>
+  {:else}
+  <!-- Activity Feed View -->
+  <div class="flex-1 overflow-auto p-4">
+    <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-3">
+      Recent Activity
+    </h3>
+    <ActivityFeed {annotations} {approvals} onAnnotationClick={onAnnotationClick} />
+  </div>
+  {/if}
 </div>
