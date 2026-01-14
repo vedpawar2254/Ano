@@ -1,46 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar */
+/* Base styles */
+html {
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
+  background: rgba(120, 113, 108, 0.3);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: rgba(120, 113, 108, 0.5);
 }
 
-/* Line highlight animation */
-@keyframes highlight-pulse {
-  0%, 100% { background-color: rgba(59, 130, 246, 0.1); }
-  50% { background-color: rgba(59, 130, 246, 0.2); }
+/* Hide scrollbar when not hovering */
+.overflow-auto:not(:hover)::-webkit-scrollbar-thumb {
+  background: transparent;
 }
 
-.line-highlight {
-  animation: highlight-pulse 2s ease-in-out infinite;
+/* Selection */
+::selection {
+  background: rgba(120, 113, 108, 0.3);
 }
 
-/* Annotation marker styles */
+/* Annotation markers */
 .annotation-marker {
-  @apply absolute -left-1 w-1 rounded-full cursor-pointer transition-all;
+  @apply absolute w-0.5 rounded-full transition-all duration-150;
+  left: 48px;
 }
 
 .annotation-marker:hover {
-  @apply w-2 -left-2;
+  @apply w-1;
 }
 
-.annotation-marker.concern { @apply bg-amber-500; }
-.annotation-marker.question { @apply bg-blue-500; }
-.annotation-marker.suggestion { @apply bg-green-500; }
-.annotation-marker.blocker { @apply bg-red-500; }
+.annotation-marker.blocker { background: #c9766a; }
+.annotation-marker.concern { background: #c9a05a; }
+.annotation-marker.question { background: #7a9bb8; }
+.annotation-marker.suggestion { background: #6b9e7a; }
+.annotation-marker.resolved { background: rgba(120, 113, 108, 0.4); }
+
+/* Focus styles */
+*:focus-visible {
+  outline: 1px solid rgba(120, 113, 108, 0.5);
+  outline-offset: 2px;
+}
+
+/* Transitions */
+* {
+  transition-property: background-color, border-color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

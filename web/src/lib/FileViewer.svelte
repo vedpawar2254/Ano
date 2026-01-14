@@ -15,11 +15,9 @@
 
   let { content, annotations, selectedLine, onLineClick, onLineDoubleClick, onAnnotationClick, onSelection, onSelectionClear, onLineEdit }: Props = $props();
 
-  // Editing state
   let editingLine = $state<number | null>(null);
   let editValue = $state('');
 
-  // Helper to find line number from element
   function findLineNumber(node: Node): number | null {
     let element = node;
     while (element && element.nodeType !== Node.ELEMENT_NODE) {
@@ -36,7 +34,6 @@
     return null;
   }
 
-  // Handle text selection
   function handleMouseUp(e: MouseEvent) {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
@@ -44,30 +41,23 @@
     if (selectedText && selectedText.length > 0) {
       const range = selection?.getRangeAt(0);
       if (range) {
-        // Get start and end line numbers
         const startLine = findLineNumber(range.startContainer);
         const endLine = findLineNumber(range.endContainer);
 
         if (startLine !== null && onSelection) {
-          // Get selection rectangle for tooltip positioning
           const rect = range.getBoundingClientRect();
           const x = rect.left + rect.width / 2;
           const y = rect.top;
-
-          // Only pass endLine if different from startLine
           const finalEndLine = endLine !== null && endLine !== startLine ? endLine : undefined;
           onSelection(startLine, finalEndLine, x, y, selectedText);
         }
       }
     } else {
-      // No selection, clear tooltip
       onSelectionClear?.();
     }
   }
 
-  // Handle click to clear selection
   function handleClick() {
-    // Small delay to allow selection check first
     setTimeout(() => {
       const selection = window.getSelection();
       const selectedText = selection?.toString().trim();
@@ -77,10 +67,8 @@
     }, 10);
   }
 
-  // Split content into lines
   let lines = $derived(content.split('\n'));
 
-  // Get annotations for a specific line (including multi-line ranges)
   function getLineAnnotations(lineNum: number): Annotation[] {
     return annotations.filter(a => {
       const startLine = a.anchor.line;
@@ -89,12 +77,10 @@
     });
   }
 
-  // Get the most severe annotation type for a line (for marker color)
   function getLineMarkerType(lineNum: number): string | null {
     const lineAnnotations = getLineAnnotations(lineNum);
     if (lineAnnotations.length === 0) return null;
 
-    // Priority: blocker > concern > question > suggestion
     if (lineAnnotations.some(a => a.type === 'blocker' && a.status === 'open')) return 'blocker';
     if (lineAnnotations.some(a => a.type === 'concern' && a.status === 'open')) return 'concern';
     if (lineAnnotations.some(a => a.type === 'question' && a.status === 'open')) return 'question';
@@ -102,7 +88,6 @@
     return 'resolved';
   }
 
-  // Handle marker click
   function handleMarkerClick(lineNum: number, e: MouseEvent) {
     e.stopPropagation();
     const lineAnnotations = getLineAnnotations(lineNum);
@@ -111,34 +96,21 @@
     }
   }
 
-  // Helper functions
-  function getBackgroundClass(type: string | null): string {
+  function getLineBackground(type: string | null): string {
     switch (type) {
-      case 'blocker': return 'bg-red-500';
-      case 'concern': return 'bg-amber-500';
-      case 'question': return 'bg-blue-500';
-      case 'suggestion': return 'bg-green-500';
+      case 'blocker': return 'bg-blocker-light';
+      case 'concern': return 'bg-concern-light';
+      case 'question': return 'bg-question-light';
+      case 'suggestion': return 'bg-suggestion-light';
       default: return '';
     }
   }
 
-  function getBadgeClass(type: string | null): string {
-    switch (type) {
-      case 'blocker': return 'bg-red-500/20 text-red-400';
-      case 'concern': return 'bg-amber-500/20 text-amber-400';
-      case 'question': return 'bg-blue-500/20 text-blue-400';
-      case 'suggestion': return 'bg-green-500/20 text-green-400';
-      default: return 'bg-slate-500/20 text-slate-400';
-    }
-  }
-
-  // Start editing a line
   function startEditing(lineNum: number, currentContent: string) {
     editingLine = lineNum;
     editValue = currentContent;
   }
 
-  // Save the edit
   function saveEdit() {
     if (editingLine !== null && onLineEdit) {
       onLineEdit(editingLine, editValue);
@@ -147,13 +119,11 @@
     editValue = '';
   }
 
-  // Cancel the edit
   function cancelEdit() {
     editingLine = null;
     editValue = '';
   }
 
-  // Handle keydown in edit input
   function handleEditKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -164,16 +134,13 @@
     }
   }
 
-  // Handle double-click - start editing if no text selected
   function handleDoubleClick(lineNum: number, lineContent: string, e: MouseEvent) {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
-    // If text is selected, let the annotation flow happen
     if (selectedText && selectedText.length > 0) {
       onLineDoubleClick(lineNum);
     } else {
-      // No text selected, start editing
       e.preventDefault();
       e.stopPropagation();
       startEditing(lineNum, lineContent);
@@ -181,7 +148,7 @@
   }
 </script>
 
-<div class="font-mono text-sm" onmouseup={handleMouseUp} onclick={handleClick}>
+<div class="font-mono text-[13px] leading-6 py-2" onmouseup={handleMouseUp} onclick={handleClick}>
   {#each lines as line, i}
     {@const lineNum = i + 1}
     {@const markerType = getLineMarkerType(lineNum)}
@@ -192,7 +159,7 @@
 
     <div
       id="line-{lineNum}"
-      class="flex group hover:bg-slate-800/50 cursor-pointer relative {isSelected ? 'bg-blue-900/30 ring-1 ring-blue-500/50' : ''} {isEditing ? 'bg-emerald-900/20 ring-1 ring-emerald-500/50' : ''}"
+      class="flex group cursor-pointer relative {isSelected ? 'bg-surface-800/50' : 'hover:bg-surface-900/50'} {isEditing ? 'bg-surface-800/30' : ''}"
       onclick={() => !isEditing && onLineClick(lineNum)}
       ondblclick={(e) => handleDoubleClick(lineNum, line, e)}
       onkeydown={(e) => e.key === 'Enter' && !isEditing && onLineClick(lineNum)}
@@ -200,54 +167,41 @@
       tabindex="0"
     >
       <!-- Line number -->
-      <div class="w-12 flex-shrink-0 text-right pr-4 text-slate-500 select-none border-r border-slate-700 {isEditing ? 'text-emerald-400' : ''}">
+      <div class="w-12 flex-shrink-0 text-right pr-4 text-surface-600 select-none {isEditing ? 'text-surface-400' : ''}">
         {lineNum}
       </div>
 
       <!-- Annotation marker -->
       {#if markerType && !isEditing}
         <button
-          class="absolute left-12 w-1 h-full annotation-marker {markerType} border-0 p-0"
+          class="annotation-marker h-full {markerType}"
           onclick={(e) => handleMarkerClick(lineNum, e)}
-          title="{lineAnnotations.length} annotation{lineAnnotations.length > 1 ? 's' : ''}"
-          aria-label="View annotations for line {lineNum}"
+          aria-label="View annotations"
         ></button>
       {/if}
 
-      <!-- Line content or edit input -->
+      <!-- Line content -->
       {#if isEditing}
-        <div class="flex-1 pl-4 pr-4 py-0.5">
+        <div class="flex-1 pl-4 pr-4">
           <input
             type="text"
             bind:value={editValue}
             onkeydown={handleEditKeydown}
             onblur={saveEdit}
-            class="w-full bg-slate-900 border border-emerald-500/50 rounded px-2 py-0.5 text-slate-200 font-mono text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            class="w-full bg-transparent border-b border-surface-600 text-surface-100 font-mono text-[13px] focus:outline-none focus:border-surface-400 py-0.5"
             autofocus
           />
-          <div class="text-xs text-slate-500 mt-1">
-            Enter to save, Esc to cancel
-          </div>
         </div>
       {:else}
-        <div class="flex-1 pl-4 pr-4 py-0.5 whitespace-pre-wrap break-all {hasAnnotations && markerType !== 'resolved' ? 'bg-opacity-10 ' + getBackgroundClass(markerType) : ''}">
+        <div class="flex-1 pl-4 pr-4 whitespace-pre-wrap break-all {hasAnnotations && markerType !== 'resolved' ? getLineBackground(markerType) : ''} text-surface-200">
           {line || ' '}
         </div>
       {/if}
 
-      <!-- Annotation count badge (on hover) -->
+      <!-- Annotation count (on hover) -->
       {#if hasAnnotations && !isEditing}
-        <div class="absolute right-2 top-0 bottom-0 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <span class="px-2 py-0.5 rounded-full text-xs {getBadgeClass(markerType)}">
-            {lineAnnotations.length}
-          </span>
-        </div>
-      {/if}
-
-      <!-- Selection hint (on hover, no annotation) -->
-      {#if !hasAnnotations && !isEditing}
-        <div class="absolute right-2 top-0 bottom-0 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <span class="text-xs text-slate-600">double-click to edit</span>
+        <div class="absolute right-3 top-0 bottom-0 flex items-center opacity-0 group-hover:opacity-100">
+          <span class="text-[11px] text-surface-500">{lineAnnotations.length}</span>
         </div>
       {/if}
     </div>

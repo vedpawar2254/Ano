@@ -258,6 +258,22 @@
       "content": "asdfasdf",
       "status": "resolved",
       "replies": []
+    },
+    {
+      "id": "71136e50-f6e1-439a-b87d-10d1397664e2",
+      "anchor": {
+        "line": 9,
+        "endLine": 12,
+        "contextBefore": "\n### 1. Inline Annotations",
+        "contextAfter": "### 2. Annotation Templates\nStructured comment types for clarity:",
+        "contentHash": "a3076df7dcaa"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-14T07:11:45.764Z",
+      "content": "asdfvadsfv",
+      "status": "resolved",
+      "replies": []
     }
   ],
   "approvals": [

@@ -13,10 +13,8 @@
 
   let { annotations, approvals, selectedAnnotation, onAnnotationClick, onResolve }: Props = $props();
 
-  // Filter state
   let filter = $state<'all' | 'open' | 'blockers'>('all');
 
-  // Filtered annotations
   let filteredAnnotations = $derived(() => {
     switch (filter) {
       case 'open':
@@ -28,41 +26,46 @@
     }
   });
 
-  // Sort by line number
   let sortedAnnotations = $derived(
     [...filteredAnnotations()].sort((a, b) => a.anchor.line - b.anchor.line)
   );
 </script>
 
 <div class="flex flex-col h-full">
-  <!-- Tabs / Filters -->
-  <div class="flex border-b border-slate-700">
+  <!-- Tabs -->
+  <div class="flex border-b border-surface-800/50 px-4">
     <button
-      class="flex-1 px-4 py-3 text-sm font-medium transition-colors {filter === 'all' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-slate-200'}"
+      class="px-3 py-3 text-[13px] transition-colors {filter === 'all'
+        ? 'text-surface-200 border-b border-surface-400'
+        : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'all'}
     >
-      All ({annotations.length})
+      All
     </button>
     <button
-      class="flex-1 px-4 py-3 text-sm font-medium transition-colors {filter === 'open' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-slate-200'}"
+      class="px-3 py-3 text-[13px] transition-colors {filter === 'open'
+        ? 'text-surface-200 border-b border-surface-400'
+        : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'open'}
     >
-      Open ({annotations.filter(a => a.status === 'open').length})
+      Open
     </button>
     <button
-      class="flex-1 px-4 py-3 text-sm font-medium transition-colors {filter === 'blockers' ? 'text-red-400 border-b-2 border-red-400' : 'text-slate-400 hover:text-slate-200'}"
+      class="px-3 py-3 text-[13px] transition-colors {filter === 'blockers'
+        ? 'text-blocker-text border-b border-blocker'
+        : 'text-surface-500 hover:text-surface-300'}"
       onclick={() => filter = 'blockers'}
     >
-      Blockers ({annotations.filter(a => a.type === 'blocker' && a.status === 'open').length})
+      Blockers
     </button>
   </div>
 
   <!-- Content -->
-  <div class="flex-1 overflow-auto">
-    <!-- Approvals Section -->
+  <div class="flex-1 overflow-auto p-4">
+    <!-- Approvals -->
     {#if approvals.length > 0}
-      <div class="p-4 border-b border-slate-700">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+      <div class="mb-6">
+        <h3 class="text-[11px] font-medium text-surface-500 uppercase tracking-wider mb-3">
           Approvals
         </h3>
         <div class="space-y-2">
@@ -73,18 +76,14 @@
       </div>
     {/if}
 
-    <!-- Annotations Section -->
-    <div class="p-4">
-      <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-        Annotations
-      </h3>
-
+    <!-- Annotations -->
+    <div>
       {#if sortedAnnotations.length === 0}
-        <p class="text-slate-500 text-sm text-center py-8">
-          No annotations{filter !== 'all' ? ' matching filter' : ''}
+        <p class="text-surface-600 text-[13px] text-center py-8">
+          No annotations
         </p>
       {:else}
-        <div class="space-y-3">
+        <div class="space-y-2">
           {#each sortedAnnotations as annotation (annotation.id)}
             <AnnotationCard
               {annotation}

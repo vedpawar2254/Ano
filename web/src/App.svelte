@@ -405,7 +405,7 @@ This is a sample plan file to demonstrate the annotation viewer.
   });
 </script>
 
-<div class="h-screen flex flex-col">
+<div class="h-screen flex flex-col bg-surface-950">
   <Header {fileName} {fileContent} {annotationData} {files} onExport={handleExport} onFileSwitch={handleFileSwitch} />
 
   <div class="flex-1 flex overflow-hidden">
@@ -423,7 +423,7 @@ This is a sample plan file to demonstrate the annotation viewer.
       />
     </div>
 
-    <div class="w-96 border-l border-slate-700 overflow-auto">
+    <div class="w-80 border-l border-surface-800/50 overflow-auto bg-surface-950">
       <Sidebar
         annotations={annotationData?.annotations || []}
         approvals={annotationData?.approvals || []}
