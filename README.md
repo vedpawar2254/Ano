@@ -1,4 +1,4 @@
-### 🚨🚨 Beta Launch in 1 day...
+### 🚨🚨 Beta release out now!! 🚨🚨
 # Ano
 
 **Collaborative annotation and review for Claude Code**
@@ -70,7 +70,6 @@ npm link
 | `ano annotate <file>:<start>-<end> "msg"` | Add annotation spanning multiple lines |
 | `ano list <file>` | List all annotations for a file |
 | `ano resolve <file> <id>` | Mark annotation as resolved |
-| `ano reopen <file> <id>` | Reopen a resolved annotation |
 | `ano reply <file> <id> "msg"` | Add threaded reply |
 | `ano delete <file> <id>` | Delete an annotation |
 | `ano sync <file>` | Sync annotation positions after file changes |
@@ -136,7 +135,6 @@ The web viewer provides a rich interface for reviewing annotated files:
 | `j` / `↓` | Next annotation |
 | `k` / `↑` | Previous annotation |
 | `r` | Resolve selected annotation |
-| `u` | Reopen selected annotation |
 | `Shift+D` | Delete selected annotation |
 | `a` | Add annotation at selected line |
 | `/` | Focus search |
@@ -147,7 +145,7 @@ The web viewer provides a rich interface for reviewing annotated files:
 
 - **Annotations** - List and filter annotations by status (all/open/blockers)
 - **Activity** - Chronological feed of all annotation and approval changes
-- **Changes** - Diff view showing what changed since page load (added, removed, resolved, reopened)
+- **Changes** - Diff view showing what changed since page load (added, removed, resolved)
 
 ### Sharing
 

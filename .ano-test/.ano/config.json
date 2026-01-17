@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "projectName": "Test Team",
+  "members": [
+    {
+      "name": "Alice",
+      "email": "alice@example.com",
+      "role": "reviewer"
+    },
+    {
+      "name": "Bob",
+      "email": "bob@example.com",
+      "role": "lead"
+    }
+  ],
+  "roles": {
+    "lead": {
+      "canOverride": true,
+      "weight": 2
+    },
+    "reviewer": {
+      "canOverride": false,
+      "weight": 1
+    }
+  },
+  "requirements": {
+    "minApprovals": 1
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "exportedAt": "2026-01-17T07:48:19.570Z",
+  "sourceFile": "test-plan.md",
+  "version": "1.0",
+  "file": "/Users/vedpawar2254/Desktop/personalP/ano/.ano-test/test-plan.md",
+  "fileHash": "900ba691fc84",
+  "annotations": [
+    {
+      "id": "753e6bff-fdc2-4cd9-b9a8-2a4ec627658d",
+      "anchor": {
+        "line": 12,
+        "contextBefore": "2. Implement API endpoints\n3. Build frontend components",
+        "contextAfter": "5. Deploy to staging\n",
+        "contentHash": "bf11b0477fc1"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:17.438Z",
+      "content": "Which PostgreSQL version?",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "9f4e28fd-4e2c-47e3-b6e3-fb7de1281dbc",
+      "anchor": {
+        "line": 15,
+        "contextBefore": "5. Deploy to staging\n",
+        "contextAfter": "\nWe will use PostgreSQL for data storage and React for the frontend.",
+        "contentHash": "4aee9830c965"
+      },
+      "type": "suggestion",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:17.521Z",
+      "content": "Consider adding CORS configuration",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "75e581f6-f279-45b2-b2eb-fde8aae320ae",
+      "anchor": {
+        "line": 20,
+        "contextBefore": "\n## Security Considerations",
+        "contextAfter": "- Input validation required\n- Authentication middleware needed",
+        "contentHash": "e3b0c44298fc"
+      },
+      "type": "blocker",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:17.595Z",
+      "content": "Security audit required before deployment",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "0d5f74a9-91b4-43d4-9426-b8956b0b38c9",
+      "anchor": {
+        "line": 8,
+        "endLine": 10,
+        "contextBefore": "\n## Implementation Steps",
+        "contextAfter": "3. Build frontend components\n4. Write tests",
+        "contentHash": "e1443110f9d4"
+      },
+      "type": "concern",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:17.668Z",
+      "content": "These three steps need more detail",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "068917b4-b5d2-4f21-893a-1c15adaa0854",
+      "anchor": {
+        "line": 3,
+        "contextBefore": "# UPDATED PLAN\n# Test Plan for Feature X",
+        "contextAfter": "## Overview\nThis is a test plan for implementing feature X in our application.",
+        "contentHash": "e3b0c44298fc"
+      },
+      "type": "suggestion",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:17.939Z",
+      "content": "[nit] Minor typo: should be Feature",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "3d15e5a5-c24a-4b36-8b0c-0e4f80d06f6b",
+      "anchor": {
+        "line": 6,
+        "contextBefore": "## Overview\nThis is a test plan for implementing feature X in our application.",
+        "contextAfter": "## Implementation Steps\n",
+        "contentHash": "e3b0c44298fc"
+      },
+      "type": "question",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:18.028Z",
+      "content": "What about mobile support?",
+      "status": "open",
+      "replies": []
+    },
+    {
+      "id": "d971eebd-f490-4008-93ac-02229f878fdf",
+      "anchor": {
+        "line": 18,
+        "contextBefore": "\nWe will use PostgreSQL for data storage and React for the frontend.",
+        "contextAfter": "## Security Considerations\n",
+        "contentHash": "e3b0c44298fc"
+      },
+      "type": "blocker",
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "timestamp": "2026-01-17T07:48:18.101Z",
+      "content": "Missing encryption strategy",
+      "status": "open",
+      "replies": []
+    }
+  ],
+  "approvals": [
+    {
+      "author": "ved <ved.pawar2024@nst.rishihood.edu.in>",
+      "status": "approved",
+      "timestamp": "2026-01-17T07:48:19.351Z",
+      "comment": "Ready for production"
+    }
+  ]
+}
