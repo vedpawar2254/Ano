@@ -37,7 +37,7 @@ export function Hero() {
   const [copied, setCopied] = useState(false);
 
   const copyCommand = () => {
-    navigator.clipboard.writeText('npm install -g ano');
+    navigator.clipboard.writeText('npm install -g @nakedved/ano');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -125,7 +125,7 @@ export function Hero() {
               className="group flex items-center gap-3 px-5 py-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300"
             >
               <span className="font-mono text-sm text-zinc-300">
-                npm install -g ano
+                npm install -g @nakedved/ano
               </span>
               <span className="text-zinc-600 group-hover:text-zinc-400 transition-colors">
                 {copied ? (

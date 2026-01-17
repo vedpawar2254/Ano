@@ -51,7 +51,7 @@ npm pack --dry-run
 npm pack
 
 # 4. Test installation locally
-npm install -g vedpawar-ano-0.1.0.tgz
+npm install -g nakedved-ano-0.1.0.tgz
 
 # 5. Verify it works
 ano --version
@@ -63,8 +63,8 @@ ano serve test.md
 # Visit http://localhost:3000
 
 # 7. Clean up
-npm uninstall -g @vedpawar/ano
-rm vedpawar-ano-0.1.0.tgz
+npm uninstall -g @nakedved/ano
+rm nakedved-ano-0.1.0.tgz
 ```
 
 ### Publish Manually (First Time)
@@ -93,7 +93,7 @@ npm publish --access public
 **Workflow Triggers:**
 - Runs on: Push to `main` (not PRs)
 - Needs: `build` job to pass
-- Publishes: `@vedpawar/ano@0.1.0`
+- Publishes: `@nakedved/ano@0.1.0`
 
 ---
 
@@ -244,7 +244,7 @@ npm install --save-dev semantic-release @semantic-release/changelog @semantic-re
 ### "Package name already taken"
 
 **Problem:** `ano` is already published
-**Solution:** ✅ Already using `@vedpawar/ano` (scoped package)
+**Solution:** ✅ Already using `@nakedved/ano` (scoped package)
 
 ### "You must sign in to publish"
 
@@ -287,9 +287,9 @@ npm publish --access public
 
 ### npm Package
 
-- **Stats**: https://www.npmjs.com/package/@vedpawar/ano
+- **Stats**: https://www.npmjs.com/package/@nakedved/ano
 - **Downloads**: Check daily/weekly/monthly on npm
-- **Unpkg CDN**: https://unpkg.com/@vedpawar/ano@latest/
+- **Unpkg CDN**: https://unpkg.com/@nakedved/ano@latest/
 
 ### Landing Page
 

@@ -76,8 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Build & Deploy
 - TypeScript compilation with type definitions
 - Bundled web viewer assets
-- npm package with CLI binary
+- npm package `@nakedved/ano` with CLI binary
 - GitHub Actions CI/CD pipeline
-- Multi-Node.js version testing (18, 20, 22)
+- Multi-Node.js version testing (20, 22)
+- Published to npm registry
 
 [0.1.0]: https://github.com/vedpawar2254/Ano/releases/tag/v0.1.0

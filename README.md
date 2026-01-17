@@ -24,7 +24,7 @@ Ano enables teams to annotate, review, and approve Claude-generated plans and ma
 
 ```bash
 # Install globally
-npm install -g @vedpawar/ano
+npm install -g @nakedved/ano
 
 # Add an annotation
 ano annotate plan.md:15 "Is this approach safe?" --type concern
@@ -50,7 +50,7 @@ ano serve plan.md README.md design.md
 ### From npm (Recommended)
 
 ```bash
-npm install -g @vedpawar/ano
+npm install -g @nakedved/ano
 ```
 
 ### From source

@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 const codeBlocks = [
   {
     title: 'Install',
-    code: 'npm install -g ano',
+    code: 'npm install -g @nakedved/ano',
     description: 'Install Ano globally'
   },
   {

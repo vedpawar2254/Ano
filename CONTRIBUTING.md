@@ -14,8 +14,8 @@ Thanks for your interest in contributing to Ano! This guide will help you get st
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ano
-cd ano
+git clone https://github.com/vedpawar2254/Ano.git
+cd Ano
 
 # Install dependencies
 npm install

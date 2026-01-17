@@ -4,11 +4,17 @@ This guide will help you get Ano up and running in your project.
 
 ## Installation
 
+### From npm (Recommended)
+
+```bash
+npm install -g @nakedved/ano
+```
+
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/ano
-cd ano
+git clone https://github.com/vedpawar2254/Ano.git
+cd Ano
 npm install
 npm run build
 

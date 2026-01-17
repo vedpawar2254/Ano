@@ -23,7 +23,7 @@ export function Banner() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="text-emerald-400 text-sm font-medium">Beta release in 1 day</span>
+                <span className="text-emerald-400 text-sm font-medium">Beta release out now!!</span>
               </div>
               <span className="text-zinc-600 text-sm hidden sm:inline">→</span>
               <a
