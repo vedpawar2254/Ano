@@ -20,7 +20,7 @@ This guide walks you through deploying Ano to npm and the landing page to Vercel
 1. **npm Account**
    - Create account at https://www.npmjs.com/signup
    - Verify your email
-<!-- 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 -->
+
 2. **npm Access Token**
    ```bash
    # Login to npm
