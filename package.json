@@ -1,5 +1,5 @@
 {
-  "name": "ano",
+  "name": "@vedpawar2254/ano",
   "version": "0.1.0",
   "description": "Claude Code plugin for collaborative annotation and review",
   "type": "module",
@@ -8,6 +8,21 @@
   "bin": {
     "ano": "./dist/cli/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vedpawar2254/Ano.git"
+  },
+  "homepage": "https://github.com/vedpawar2254/Ano#readme",
+  "bugs": {
+    "url": "https://github.com/vedpawar2254/Ano/issues"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "docs/"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",

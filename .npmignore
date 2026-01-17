@@ -1,0 +1,51 @@
+# Development and test files
+.ano-test/
+TEST-*.md
+test-*.sh
+test-*.log
+test-output.log
+
+# Planning and notes
+PLAN.md
+notes.md
+todo.md
+
+# GitHub specific
+.github/
+
+# Landing page (deployed separately)
+landing/
+
+# Web source (only ship built assets in dist/web/)
+web/src/
+web/public/
+web/node_modules/
+web/package*.json
+web/tsconfig.json
+web/vite.config.ts
+web/tailwind.config.js
+web/postcss.config.js
+
+# Example annotations
+*.annotations.json
+examples_for_learning_while_developing/
+
+# Build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

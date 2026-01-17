@@ -84,8 +84,7 @@ jobs:
           mkdir -p dist/web
           cp -r web/dist/* dist/web/
 
-      # Uncomment when ready to publish to npm
-      # - name: Publish to npm
-      #   run: npm publish --access public
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
