@@ -1,4 +1,5 @@
 ### 🚨🚨 Beta release out now!! 🚨🚨
+
 # Ano
 
 **Collaborative annotation and review for Claude Code**
@@ -398,6 +399,10 @@ ano/
 | `concern` | Risk or issue identified | No |
 | `question` | Clarification needed | No |
 | `suggestion` | Improvement idea | No |
+
+
+NPM: https://www.npmjs.com/package/@nakedved/ano 
+ 
 
 ## License
 
