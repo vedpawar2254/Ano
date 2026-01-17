@@ -34,4 +34,10 @@ npm-debug.log*
 .ano-overrides.log
 
 # Lock files (uncomment if you want to ignore)
-# package-lock.json
+package-lock.json
+
+WEB-VIEWER-DEPLOYMENT.md
+DEPLOYMENT.md
+QUICK-PUBLISH.txt
+MANUAL-PUBLISH.md
+SETUP-TOKEN.md
